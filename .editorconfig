@@ -1,0 +1,3 @@
+[*.{kt,kts}]
+# Disables the standard function naming rule globally
+ktlint_standard_function-naming = disabled
