@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Dns
@@ -25,6 +26,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.autofill.ContentType
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.semantics.contentType
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.ImeAction
@@ -34,8 +36,17 @@ import androidx.compose.ui.unit.dp
 import com.jassin.customdrome.ui.theme.CustomDromeTheme
 
 @Composable
-fun LoginScreen(onBack: () -> Unit) {
+fun LoginScreen(
+    onLogin: () -> Unit,
+    onBack: () -> Unit,
+) {
     CustomDromeTheme {
+        val keyboardController = LocalSoftwareKeyboardController.current
+        val onFinishAction = {
+            keyboardController?.hide()
+            onLogin()
+        }
+
         // responsible for the themed bg color
         Surface(
             modifier = Modifier.fillMaxSize(),
@@ -117,13 +128,19 @@ fun LoginScreen(onBack: () -> Unit) {
                                 keyboardType = KeyboardType.Password, // for password managers / autofill
                                 imeAction = ImeAction.Done, // close keyboard when finished
                             ),
+                        keyboardActions =
+                            KeyboardActions(
+                                onDone = {
+                                    onFinishAction()
+                                },
+                            ),
                     )
 
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
-                        Button(onClick = { /* logic goes here */ }) {
+                        Button(onClick = { onFinishAction() }) {
                             Text("Login")
                         }
 

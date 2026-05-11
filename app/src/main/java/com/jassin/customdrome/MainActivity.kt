@@ -90,9 +90,16 @@ fun AppNavigation() {
                 })
             }
             composable("login") {
-                LoginScreen(onBack = {
-                    navController.popBackStack()
-                })
+                LoginScreen(
+                    onLogin = {
+                        navController.navigate("home") {
+                            popUpTo("login") { inclusive = true }
+                        }
+                    },
+                    onBack = {
+                        navController.popBackStack()
+                    },
+                )
             }
         }
     }
