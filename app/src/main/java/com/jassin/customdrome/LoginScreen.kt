@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Dns
 import androidx.compose.material3.Button
@@ -23,6 +24,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.autofill.ContentType
+import androidx.compose.ui.semantics.contentType
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import com.jassin.customdrome.ui.theme.CustomDromeTheme
 
@@ -45,12 +52,14 @@ fun LoginScreen(onBack: () -> Unit) {
                 Column(
                     modifier =
                         Modifier
-                            .fillMaxSize()
+                            .fillMaxWidth()
                             .padding(24.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
                     var instanceUrl by remember { mutableStateOf("") }
+                    var username by remember { mutableStateOf("") }
+                    var password by remember { mutableStateOf("") }
 
                     Text(
                         text = "Login to CustomDrome",
@@ -70,6 +79,44 @@ fun LoginScreen(onBack: () -> Unit) {
                         leadingIcon = {
                             Icon(Icons.Default.Dns, contentDescription = null)
                         },
+                        keyboardOptions =
+                            KeyboardOptions(
+                                imeAction = ImeAction.Next, // move cursor to next text field
+                            ),
+                    )
+
+                    OutlinedTextField(
+                        value = username,
+                        onValueChange = { username = it },
+                        label = { Text("Username") },
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .semantics {
+                                    contentType = ContentType.Username
+                                },
+                        keyboardOptions =
+                            KeyboardOptions(
+                                keyboardType = KeyboardType.Email, // for password managers / autofill
+                                imeAction = ImeAction.Next, // move cursor to next text field
+                            ),
+                    )
+                    OutlinedTextField(
+                        value = password,
+                        onValueChange = { password = it },
+                        label = { Text("Password") },
+                        visualTransformation = PasswordVisualTransformation(), // for password security
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .semantics {
+                                    contentType = ContentType.Password
+                                },
+                        keyboardOptions =
+                            KeyboardOptions(
+                                keyboardType = KeyboardType.Password, // for password managers / autofill
+                                imeAction = ImeAction.Done, // close keyboard when finished
+                            ),
                     )
 
                     Row(
