@@ -3,6 +3,7 @@ package com.jassin.customdrome
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Album
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -20,9 +21,8 @@ sealed class Screen(
 ) {
     object Home : Screen("home", "Home", Icons.Default.Home)
 
+    object Songs : Screen("songs", "Songs", Icons.Default.MusicNote)
     object Playlists : Screen("playlists", "Playlists", Icons.Default.Album)
-
-    // object Albums : Screen("albums", "Albums", Icons.Default.Home)
 
     // object Settings : Screen("settings", "Settings", Icons.Default.Settings)
 }
@@ -32,9 +32,9 @@ fun BottomBar(navController: NavHostController) {
     val items =
         listOf(
             Screen.Home,
+            Screen.Songs,
             Screen.Playlists,
-            /*Screen.Albums,
-            Screen.Settings,*/
+            // Screen.Settings,
         )
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()

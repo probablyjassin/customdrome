@@ -23,6 +23,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.jassin.customdrome.tabs.Playlists
+import com.jassin.customdrome.tabs.Songs
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -81,6 +82,8 @@ fun AppNavigation() {
                     navController.navigate("login")
                 })
             }
+
+            composable(route="songs") { Songs() }
 
             composable(route = "playlists") { Playlists() }
         }
