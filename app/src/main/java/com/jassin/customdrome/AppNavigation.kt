@@ -23,7 +23,7 @@ fun AppNavigation(userPrefs: UserPreferences) {
 
     fun showNavElements(): Boolean = currentRoute != "login" && currentRoute != "settings"
 
-    PlayerScaffold(navController = navController) { paddingValues ->
+    PlayerScaffold(navController = navController, showNavElements()) { paddingValues ->
         /*topBar = {
             if (showNavElements()) {
                 TopBar(onGoToSettings = { navController.navigate(route = "settings") })

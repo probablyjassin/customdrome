@@ -56,12 +56,17 @@ private val BottomNavHeight = 80.dp
 @Composable
 fun PlayerScaffold(
     navController: NavHostController,
+    showNavBars: Boolean,
     content: @Composable (PaddingValues) -> Unit,
 ) {
+    if (showNavBars) {
+        TopBar(onGoToSettings = { navController.navigate(route = "settings") })
+    }
+
     val isSongPlaying = true // ← swap for real state later
 
-    // Single source of truth: 0 = fully collapsed, 1 = fully expanded.
-    // We snapTo() it on every drag frame so the sheet follows the finger exactly,
+    // 0 = fully collapsed, 1 = fully expanded.
+    // snapTo() on every drag frame so the sheet follows the finger exactly,
     // then animateTo() the nearest target on release for a springy snap.
     val expandProgress = remember { Animatable(0f, Float.VectorConverter) }
     val scope = rememberCoroutineScope()
@@ -89,6 +94,8 @@ fun PlayerScaffold(
         ) {
             BottomBar(navController)
         }
+
+        // TODO: take the miniplayer into a different file and make its display conditional alongside the bottom navbar
 
         // ── Player surface ────────────────────────────────────────────────────
         if (isSongPlaying) {
