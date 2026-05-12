@@ -2,7 +2,6 @@ package com.jassin.customdrome
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -24,8 +23,8 @@ fun AppNavigation(userPrefs: UserPreferences) {
 
     fun showNavElements(): Boolean = currentRoute != "login" && currentRoute != "settings"
 
-    Scaffold(
-        topBar = {
+    PlayerScaffold(navController = navController) { paddingValues ->
+        /*topBar = {
             if (showNavElements()) {
                 TopBar(onGoToSettings = { navController.navigate(route = "settings") })
             }
@@ -35,12 +34,11 @@ fun AppNavigation(userPrefs: UserPreferences) {
                 BottomBar(navController)
             }
         },
-    ) { innerPadding ->
-        // Important: Pass innerPadding to the NavHost so content starts below the bar
+    ) { innerPadding ->*/
         NavHost(
             navController = navController,
             startDestination = "home",
-            modifier = Modifier.padding(innerPadding),
+            modifier = Modifier.padding(paddingValues),
         ) {
             composable("home") {
                 MainScreen(onNavigateToLogin = {
