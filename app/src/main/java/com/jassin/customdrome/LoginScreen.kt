@@ -47,12 +47,17 @@ fun LoginScreen(
 ) {
     CustomDromeTheme {
         val savedName by userPrefs.userName.collectAsState(initial = null)
+        val savedServerURL by userPrefs.serverURL.collectAsState(initial = null)
 
         var tempName by remember { mutableStateOf("") }
+        var tempServerURL by remember { mutableStateOf("") }
 
-        LaunchedEffect(savedName) {
+        LaunchedEffect(savedName, savedServerURL) {
             if (savedName != null) {
                 tempName = savedName!!
+            }
+            if (savedServerURL != null) {
+                tempServerURL = savedServerURL!!
             }
         }
         val scope = rememberCoroutineScope()
@@ -62,6 +67,7 @@ fun LoginScreen(
             keyboardController?.hide()
             scope.launch {
                 userPrefs.saveUsername(tempName)
+                userPrefs.saveServerURL((tempServerURL))
             }
             onLogin()
         }
@@ -87,7 +93,7 @@ fun LoginScreen(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
-                    var instanceUrl by remember { mutableStateOf("") }
+                    // var instanceUrl by remember { mutableStateOf("") }
                     // var username by remember { mutableStateOf("") }
                     var password by remember { mutableStateOf("") }
 
@@ -98,12 +104,12 @@ fun LoginScreen(
                     )
 
                     OutlinedTextField(
-                        value = instanceUrl,
-                        onValueChange = { instanceUrl = it },
+                        value = tempServerURL,
+                        onValueChange = { tempServerURL = it },
                         // This is the text that floats to the top corner
-                        label = { Text("Instance URL") },
+                        label = { Text("Server URL") },
                         // This only appears once you click and the label moves up
-                        placeholder = { Text("https://example.com") },
+                        placeholder = { Text("http://navidrome.int") },
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true,
                         leadingIcon = {
