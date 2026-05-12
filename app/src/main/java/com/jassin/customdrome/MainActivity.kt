@@ -18,10 +18,11 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        val userPrefs = UserPreferences(applicationContext)
         setContent {
             CustomDromeTheme {
                 Surface(modifier = Modifier.fillMaxSize()) {
-                    AppNavigation()
+                    AppNavigation(userPrefs)
                 }
             }
         }

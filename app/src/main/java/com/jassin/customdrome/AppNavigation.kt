@@ -27,7 +27,7 @@ import com.jassin.customdrome.tabs.Songs
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AppNavigation() {
+fun AppNavigation(userPrefs: UserPreferences) {
     val navController = rememberNavController()
 
     // We need to track the "current route" to decide when to show the bar
@@ -67,13 +67,17 @@ fun AppNavigation() {
                     onBack = {
                         navController.popBackStack()
                     },
+                    userPrefs = userPrefs
                 )
             }
 
             composable("settings") {
-                SettingsScreen(onGoToLogin = {
-                    navController.navigate("login")
-                })
+                SettingsScreen(
+                    onGoToLogin = {
+                        navController.navigate("login")
+                    },
+                    userPrefs = userPrefs
+                )
             }
 
             composable(route="songs") { Songs() }

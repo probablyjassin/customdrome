@@ -19,9 +19,12 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,16 +37,32 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import com.jassin.customdrome.ui.theme.CustomDromeTheme
+import kotlinx.coroutines.launch
 
 @Composable
 fun LoginScreen(
     onLogin: () -> Unit,
     onBack: () -> Unit,
+    userPrefs: UserPreferences
 ) {
     CustomDromeTheme {
+        val savedName by userPrefs.userName.collectAsState(initial = null)
+
+        var tempName by remember { mutableStateOf("") }
+
+        LaunchedEffect(savedName) {
+            if (savedName != null) {
+                tempName = savedName!!
+            }
+        }
+        val scope = rememberCoroutineScope()
+
         val keyboardController = LocalSoftwareKeyboardController.current
         val onFinishAction = {
             keyboardController?.hide()
+            scope.launch {
+                userPrefs.saveUsername(tempName)
+            }
             onLogin()
         }
 
@@ -69,7 +88,7 @@ fun LoginScreen(
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
                     var instanceUrl by remember { mutableStateOf("") }
-                    var username by remember { mutableStateOf("") }
+                    // var username by remember { mutableStateOf("") }
                     var password by remember { mutableStateOf("") }
 
                     Text(
@@ -97,8 +116,8 @@ fun LoginScreen(
                     )
 
                     OutlinedTextField(
-                        value = username,
-                        onValueChange = { username = it },
+                        value = tempName,
+                        onValueChange = { tempName = it },
                         label = { Text("Username") },
                         modifier =
                             Modifier
