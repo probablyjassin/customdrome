@@ -76,19 +76,9 @@ fun AppNavigation() {
             }
 
             composable("settings") {
-                Column(
-                    modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .padding(24.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
-                ) {
-                    Text("Settings Screen")
-                    Button(onClick = { navController.navigate("login") }) {
-                        Text("Go to login")
-                    }
-                }
+                SettingsScreen(onGoToLogin = {
+                    navController.navigate("login")
+                })
             }
 
             composable(route = "playlists") { Playlists() }
