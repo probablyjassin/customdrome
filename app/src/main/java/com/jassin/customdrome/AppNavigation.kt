@@ -46,7 +46,7 @@ fun AppNavigation() {
             }
         },
         bottomBar = {
-            if (currentRoute == "home") {
+            if (currentRoute != "login" && currentRoute != "settings") {
                 BottomBar(navController)
             }
         },
