@@ -218,16 +218,16 @@ fun FullPlayerContent(onCollapse: () -> Unit) {
     Column(
         modifier =
             Modifier
-                .fillMaxSize()
-                .padding(horizontal = 24.dp),
+                .fillMaxSize(),
+        // .padding(horizontal = 24.dp)
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween,
     ) {
-        Row(
+        /*Row(
             modifier = Modifier.padding(top = 32.dp),
         ) {
             Text("hi")
-        }
+        }*/
 
         Spacer(modifier = Modifier.size(280.dp))
 

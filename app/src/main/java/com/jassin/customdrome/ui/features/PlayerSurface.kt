@@ -36,7 +36,7 @@ fun PlayerSurface(
     val density = LocalDensity.current
 
     val miniCoverSize = 48.dp
-    val fullCoverSize = 280.dp
+    val fullCoverSize = 350.dp
 
     Box(
         modifier =
@@ -84,7 +84,7 @@ fun PlayerSurface(
 
             // Full position: centred in the surface with a slight upward shift
             val fullX = (containerWidth - fullCoverSize) / 2
-            val fullY = (containerHeight - fullCoverSize) / 2 - 24.dp
+            val fullY = (containerHeight - fullCoverSize) / 7 - 24.dp
 
             val coverSize = lerp(miniCoverSize, fullCoverSize, progress)
             val coverX = lerp(miniX, fullX, progress)
