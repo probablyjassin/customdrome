@@ -5,7 +5,6 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.VectorConverter
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -22,9 +21,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.SkipNext
 import androidx.compose.material.icons.filled.SkipPrevious
@@ -185,6 +183,9 @@ fun MiniPlayerContent() {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
+        // Reserve room for the floating album cover (48 dp) + 8 dp breathing room
+        Spacer(modifier = Modifier.width(56.dp))
+
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = "Song Title",
@@ -228,23 +229,7 @@ fun FullPlayerContent(onCollapse: () -> Unit) {
             Text("hi")
         }
 
-        Box(
-            modifier =
-                Modifier
-                    .size(280.dp)
-                    .background(
-                        color = MaterialTheme.colorScheme.primary,
-                        shape = RoundedCornerShape(20.dp),
-                    ),
-            contentAlignment = Alignment.Center,
-        ) {
-            Icon(
-                imageVector = Icons.Default.MusicNote,
-                contentDescription = null,
-                modifier = Modifier.size(80.dp),
-                tint = MaterialTheme.colorScheme.onPrimary,
-            )
-        }
+        Spacer(modifier = Modifier.size(280.dp))
 
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(text = "Song Title", style = MaterialTheme.typography.headlineSmall)
