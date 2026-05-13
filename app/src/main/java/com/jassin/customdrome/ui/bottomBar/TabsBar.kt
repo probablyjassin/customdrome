@@ -1,4 +1,4 @@
-package com.jassin.customdrome.bottomBar
+package com.jassin.customdrome.ui.bottomBar
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
