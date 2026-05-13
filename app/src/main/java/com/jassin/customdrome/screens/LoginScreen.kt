@@ -39,7 +39,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import com.jassin.customdrome.UserPreferences
-import com.jassin.customdrome.ui.theme.CustomDromeTheme
 import kotlinx.coroutines.launch
 
 @Composable
@@ -48,142 +47,140 @@ fun LoginScreen(
     onBack: () -> Unit,
     userPrefs: UserPreferences,
 ) {
-    CustomDromeTheme {
-        val context = LocalContext.current
+    val context = LocalContext.current
 
-        val savedName by userPrefs.userName.collectAsState(initial = null)
-        val savedServerURL by userPrefs.serverURL.collectAsState(initial = null)
+    val savedName by userPrefs.userName.collectAsState(initial = null)
+    val savedServerURL by userPrefs.serverURL.collectAsState(initial = null)
 
-        var tempName by remember { mutableStateOf("") }
-        var tempServerURL by remember { mutableStateOf("") }
+    var tempName by remember { mutableStateOf("") }
+    var tempServerURL by remember { mutableStateOf("") }
 
-        LaunchedEffect(savedName, savedServerURL) {
-            if (savedName != null) {
-                tempName = savedName!!
-            }
-            if (savedServerURL != null) {
-                tempServerURL = savedServerURL!!
-            }
+    LaunchedEffect(savedName, savedServerURL) {
+        if (savedName != null) {
+            tempName = savedName!!
         }
-        val scope = rememberCoroutineScope()
-
-        val keyboardController = LocalSoftwareKeyboardController.current
-        val onFinishAction = {
-            keyboardController?.hide()
-            scope.launch {
-                userPrefs.saveUsername(tempName)
-                userPrefs.saveServerURL((tempServerURL))
-                Toast
-                    .makeText(
-                        context,
-                        "Login details saved",
-                        Toast.LENGTH_LONG,
-                    ).show()
-            }
-            onLogin()
+        if (savedServerURL != null) {
+            tempServerURL = savedServerURL!!
         }
+    }
+    val scope = rememberCoroutineScope()
 
-        // responsible for the themed bg color
-        Surface(
-            modifier = Modifier.fillMaxSize(),
-            color = MaterialTheme.colorScheme.background,
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val onFinishAction = {
+        keyboardController?.hide()
+        scope.launch {
+            userPrefs.saveUsername(tempName)
+            userPrefs.saveServerURL((tempServerURL))
+            Toast
+                .makeText(
+                    context,
+                    "Login details saved",
+                    Toast.LENGTH_LONG,
+                ).show()
+        }
+        onLogin()
+    }
+
+    // responsible for the themed bg color
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = MaterialTheme.colorScheme.background,
+    ) {
+        // prevents overlap with the status bar
+        Box(
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .safeDrawingPadding(),
+            contentAlignment = Alignment.Center,
         ) {
-            // prevents overlap with the status bar
-            Box(
+            Column(
                 modifier =
                     Modifier
-                        .fillMaxSize()
-                        .safeDrawingPadding(),
-                contentAlignment = Alignment.Center,
+                        .fillMaxWidth()
+                        .padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
-                Column(
+                // var instanceUrl by remember { mutableStateOf("") }
+                // var username by remember { mutableStateOf("") }
+                var password by remember { mutableStateOf("") }
+
+                Text(
+                    text = "Login to CustomDrome",
+                    color = MaterialTheme.colorScheme.primary,
+                    style = MaterialTheme.typography.headlineMedium,
+                )
+
+                OutlinedTextField(
+                    value = tempServerURL,
+                    onValueChange = { tempServerURL = it },
+                    // This is the text that floats to the top corner
+                    label = { Text("Server URL") },
+                    // This only appears once you click and the label moves up
+                    placeholder = { Text("http://navidrome.int") },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
+                    leadingIcon = {
+                        Icon(Icons.Default.Dns, contentDescription = null)
+                    },
+                    keyboardOptions =
+                        KeyboardOptions(
+                            imeAction = ImeAction.Next, // move cursor to next text field
+                        ),
+                )
+
+                OutlinedTextField(
+                    value = tempName,
+                    onValueChange = { tempName = it },
+                    label = { Text("Username") },
                     modifier =
                         Modifier
                             .fillMaxWidth()
-                            .padding(24.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                            .semantics {
+                                contentType = ContentType.Username
+                            },
+                    keyboardOptions =
+                        KeyboardOptions(
+                            keyboardType = KeyboardType.Email, // for password managers / autofill
+                            imeAction = ImeAction.Next, // move cursor to next text field
+                        ),
+                )
+                OutlinedTextField(
+                    value = password,
+                    onValueChange = { password = it },
+                    label = { Text("Password") },
+                    visualTransformation = PasswordVisualTransformation(), // for password security
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .semantics {
+                                contentType = ContentType.Password
+                            },
+                    keyboardOptions =
+                        KeyboardOptions(
+                            keyboardType = KeyboardType.Password, // for password managers / autofill
+                            imeAction = ImeAction.Done, // close keyboard when finished
+                        ),
+                    keyboardActions =
+                        KeyboardActions(
+                            onDone = {
+                                onFinishAction()
+                            },
+                        ),
+                )
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
-                    // var instanceUrl by remember { mutableStateOf("") }
-                    // var username by remember { mutableStateOf("") }
-                    var password by remember { mutableStateOf("") }
+                    Button(onClick = { onFinishAction() }) {
+                        Text("Login")
+                    }
 
-                    Text(
-                        text = "Login to CustomDrome",
-                        color = MaterialTheme.colorScheme.primary,
-                        style = MaterialTheme.typography.headlineMedium,
-                    )
-
-                    OutlinedTextField(
-                        value = tempServerURL,
-                        onValueChange = { tempServerURL = it },
-                        // This is the text that floats to the top corner
-                        label = { Text("Server URL") },
-                        // This only appears once you click and the label moves up
-                        placeholder = { Text("http://navidrome.int") },
-                        modifier = Modifier.fillMaxWidth(),
-                        singleLine = true,
-                        leadingIcon = {
-                            Icon(Icons.Default.Dns, contentDescription = null)
-                        },
-                        keyboardOptions =
-                            KeyboardOptions(
-                                imeAction = ImeAction.Next, // move cursor to next text field
-                            ),
-                    )
-
-                    OutlinedTextField(
-                        value = tempName,
-                        onValueChange = { tempName = it },
-                        label = { Text("Username") },
-                        modifier =
-                            Modifier
-                                .fillMaxWidth()
-                                .semantics {
-                                    contentType = ContentType.Username
-                                },
-                        keyboardOptions =
-                            KeyboardOptions(
-                                keyboardType = KeyboardType.Email, // for password managers / autofill
-                                imeAction = ImeAction.Next, // move cursor to next text field
-                            ),
-                    )
-                    OutlinedTextField(
-                        value = password,
-                        onValueChange = { password = it },
-                        label = { Text("Password") },
-                        visualTransformation = PasswordVisualTransformation(), // for password security
-                        modifier =
-                            Modifier
-                                .fillMaxWidth()
-                                .semantics {
-                                    contentType = ContentType.Password
-                                },
-                        keyboardOptions =
-                            KeyboardOptions(
-                                keyboardType = KeyboardType.Password, // for password managers / autofill
-                                imeAction = ImeAction.Done, // close keyboard when finished
-                            ),
-                        keyboardActions =
-                            KeyboardActions(
-                                onDone = {
-                                    onFinishAction()
-                                },
-                            ),
-                    )
-
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    ) {
-                        Button(onClick = { onFinishAction() }) {
-                            Text("Login")
-                        }
-
-                        Button(onClick = { onBack() }) {
-                            // Trigger the back action
-                            Text("Go Back")
-                        }
+                    Button(onClick = { onBack() }) {
+                        // Trigger the back action
+                        Text("Go Back")
                     }
                 }
             }

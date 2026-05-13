@@ -9,6 +9,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.jassin.customdrome.screens.HomeScreen
 import com.jassin.customdrome.screens.LoginScreen
 import com.jassin.customdrome.screens.SettingsScreen
 import com.jassin.customdrome.tabs.Playlists
@@ -27,24 +28,13 @@ fun AppNavigation(userPrefs: UserPreferences) {
     fun showNavElements(): Boolean = currentRoute != "login" && currentRoute != "settings"
 
     PlayerScaffold(navController = navController, showNavElements()) { paddingValues ->
-        /*topBar = {
-            if (showNavElements()) {
-                TopBar(onGoToSettings = { navController.navigate(route = "settings") })
-            }
-        },
-        bottomBar = {
-            if (showNavElements()) {
-                TabsBar(navController)
-            }
-        },
-    ) { innerPadding ->*/
         NavHost(
             navController = navController,
             startDestination = "home",
             modifier = Modifier.padding(paddingValues),
         ) {
             composable("home") {
-                MainScreen(onNavigateToLogin = {
+                HomeScreen(onNavigateToLogin = {
                     navController.navigate("login")
                 })
             }
