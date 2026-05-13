@@ -79,7 +79,7 @@ fun PlayerScaffold(
         val bottomNavHeightPx = with(density) { BottomNavHeight.toPx() }
 
         // Total travel distance of the sheet top edge (collapsed→expanded).
-        val travelPx = screenHeightPx - miniPlayerHeightPx - bottomNavHeightPx - 55f
+        val travelPx = screenHeightPx - miniPlayerHeightPx - bottomNavHeightPx - with(density) { 15.dp.toPx() }
 
         // ── Main content ──────────────────────────────────────────────────────
         content(PaddingValues(bottom = BottomNavHeight))
