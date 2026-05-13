@@ -11,6 +11,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.jassin.customdrome.tabs.Playlists
 import com.jassin.customdrome.tabs.Songs
+import com.jassin.customdrome.ui.features.PlayerScaffold
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

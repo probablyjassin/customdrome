@@ -1,4 +1,4 @@
-package com.jassin.customdrome
+package com.jassin.customdrome.ui.features
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
@@ -44,8 +44,8 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.jassin.customdrome.TopBar
 import com.jassin.customdrome.ui.bottomBar.TabsBar
-import com.jassin.customdrome.ui.features.PlayerSurface
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
@@ -79,7 +79,8 @@ fun PlayerScaffold(
         val bottomNavHeightPx = with(density) { BottomNavHeight.toPx() }
 
         // Total travel distance of the sheet top edge (collapsed→expanded).
-        val travelPx = screenHeightPx - miniPlayerHeightPx - bottomNavHeightPx - with(density) { 15.dp.toPx() }
+        val travelPx =
+            screenHeightPx - miniPlayerHeightPx - bottomNavHeightPx - with(density) { 15.dp.toPx() }
 
         // ── Main content ──────────────────────────────────────────────────────
         content(PaddingValues(bottom = BottomNavHeight))
@@ -101,7 +102,8 @@ fun PlayerScaffold(
         if (isSongPlaying) {
             val progress = expandProgress.value
             val playerTopPx = travelPx * (1f - progress)
-            val playerHeightPx = miniPlayerHeightPx + progress * (screenHeightPx - miniPlayerHeightPx)
+            val playerHeightPx =
+                miniPlayerHeightPx + progress * (screenHeightPx - miniPlayerHeightPx)
             val cornerRadius = (16.dp * (1f - progress)).coerceAtLeast(0.dp)
 
             var startProgress by remember { mutableFloatStateOf(0f) }
@@ -126,13 +128,22 @@ fun PlayerScaffold(
                                     change.consume()
                                     val delta = -dragAmount / travelPx
                                     scope.launch {
-                                        expandProgress.snapTo((expandProgress.value + delta).coerceIn(0f, 1f))
+                                        expandProgress.snapTo(
+                                            (expandProgress.value + delta).coerceIn(
+                                                0f,
+                                                1f,
+                                            ),
+                                        )
                                     }
                                 },
                                 onDragEnd = {
-                                    val target = if (expandProgress.value > startProgress) 1f else 0f
+                                    val target =
+                                        if (expandProgress.value > startProgress) 1f else 0f
                                     scope.launch {
-                                        expandProgress.animateTo(target, tween(60, easing = LinearEasing))
+                                        expandProgress.animateTo(
+                                            target,
+                                            tween(60, easing = LinearEasing),
+                                        )
                                     }
                                 },
                             )
@@ -143,8 +154,6 @@ fun PlayerScaffold(
         }
     }
 }
-
-// ── Mini player ───────────────────────────────────────────────────────────────
 
 @Composable
 fun MiniPlayerContent() {
@@ -182,8 +191,6 @@ fun MiniPlayerContent() {
         }
     }
 }
-
-// ── Full screen player ────────────────────────────────────────────────────────
 
 @Composable
 fun FullPlayerContent(onCollapse: () -> Unit) {
