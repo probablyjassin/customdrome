@@ -56,7 +56,7 @@ fun LoginScreen(
 
     var tempName by remember { mutableStateOf("") }
     var tempServerURL by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
+    var tempPassword by remember { mutableStateOf("") }
 
     LaunchedEffect(savedName, savedServerURL) {
         if (savedName != null) {
@@ -77,14 +77,18 @@ fun LoginScreen(
         keyboardController?.hide()
         scope.launch {
             userPrefs.saveUsername(tempName)
-            userPrefs.saveServerURL((tempServerURL))
+            userPrefs.saveServerURL(tempServerURL)
+            userPrefs.savePassword(tempPassword)
             Toast
                 .makeText(
                     context,
                     "Login details saved",
                     Toast.LENGTH_LONG,
                 ).show()
-            authViewModel.login(tempServerURL, tempName, password)
+            val token = authViewModel.login(tempServerURL, tempName, tempPassword)
+            if (token != null) {
+                userPrefs.saveToken(token)
+            }
         }
         // onLogin()
     }
@@ -151,8 +155,8 @@ fun LoginScreen(
                         ),
                 )
                 OutlinedTextField(
-                    value = password,
-                    onValueChange = { password = it },
+                    value = tempPassword,
+                    onValueChange = { tempPassword = it },
                     label = { Text("Password") },
                     visualTransformation = PasswordVisualTransformation(), // for password security
                     modifier =
@@ -187,6 +191,13 @@ fun LoginScreen(
                         Text("Go Back")
                     }
                 }
+                if (authResult != null) {
+                    Text(
+                        text = authResult ?: "",
+                        color = MaterialTheme.colorScheme.onBackground,
+                        modifier = Modifier.fillMaxWidth().padding(top = 12.dp),
+                    )
+                }
                 if (requestText != null) {
                     Text(
                         text = "Request:\n$requestText",
@@ -195,13 +206,6 @@ fun LoginScreen(
                             Modifier
                                 .fillMaxWidth()
                                 .padding(top = 12.dp),
-                    )
-                }
-                if (authResult != null) {
-                    Text(
-                        text = authResult ?: "",
-                        color = MaterialTheme.colorScheme.onBackground,
-                        modifier = Modifier.fillMaxWidth().padding(top = 12.dp),
                     )
                 }
             }
