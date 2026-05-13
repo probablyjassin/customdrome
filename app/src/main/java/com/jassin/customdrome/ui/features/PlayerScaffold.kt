@@ -16,16 +16,12 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.SkipNext
 import androidx.compose.material.icons.filled.SkipPrevious
-import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -48,7 +44,6 @@ import com.jassin.customdrome.ui.common.TabsBar
 import com.jassin.customdrome.ui.common.TopBar
 import kotlinx.coroutines.launch
 import kotlin.math.pow
-import kotlin.math.roundToInt
 
 // Height constants shared between scaffold and content padding
 private val MiniPlayerHeight = 72.dp
@@ -75,7 +70,7 @@ fun PlayerScaffold(
     val expandProgress = remember { Animatable(0f, Float.VectorConverter) }
     val scope = rememberCoroutineScope()
 
-    // Top Navbar (only show on the main pages)
+    // Top Navbar (only show on the main pages) ──────────────────────────────────
     if (showNavBars) {
         TopBar(onGoToSettings = { navController.navigate(route = "settings") })
     }
@@ -96,13 +91,10 @@ fun PlayerScaffold(
 
         // ── Bottom navigation bar ─────────────────────────────────────────────
         if (showNavBars) {
-            val navEasing = expandProgress.value * 16 * expandProgress.value
-            val navYOffsetPx = (navEasing * bottomNavHeightPx).roundToInt()
             Box(
                 modifier =
                     Modifier
                         .align(Alignment.BottomCenter),
-                // .offset { IntOffset(0, navYOffsetPx) },
             ) {
                 TabsBar(navController)
             }
@@ -131,7 +123,12 @@ fun PlayerScaffold(
                 val currentEntry by navController.currentBackStackEntryAsState()
                 key(currentEntry) {
                     BackHandler(enabled = expandProgress.value > 0.5f) {
-                        scope.launch { expandProgress.animateTo(0f, tween(300)) }
+                        scope.launch {
+                            expandProgress.animateTo(
+                                0f,
+                                tween(300),
+                            )
+                        }
                     }
                 }
 
@@ -141,7 +138,12 @@ fun PlayerScaffold(
                     playerTopPx = playerTopPx,
                     cornerRadius = cornerRadius,
                     onCollapse = {
-                        scope.launch { expandProgress.animateTo(0f, tween(300)) }
+                        scope.launch {
+                            expandProgress.animateTo(
+                                0f,
+                                tween(300),
+                            )
+                        }
                     },
                     modifier =
                         Modifier
@@ -224,70 +226,6 @@ fun MiniPlayerContent() {
             }
             IconButton(onClick = {}) {
                 Icon(Icons.Default.SkipNext, contentDescription = "Next")
-            }
-        }
-    }
-}
-
-@Composable
-fun FullPlayerContent(
-    onCollapse: () -> Unit,
-    progress: Float,
-) {
-    Column(
-        modifier =
-            Modifier
-                .fillMaxSize(),
-        // .padding(horizontal = 24.dp)
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.SpaceBetween,
-    ) {
-        /*Row(
-            modifier = Modifier.padding(top = 32.dp),
-        ) {
-            Text("hi")
-        }*/
-
-        Spacer(modifier = Modifier.size(280.dp))
-
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(text = "Song Title", style = MaterialTheme.typography.headlineSmall)
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = "Artist Name",
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
-
-        Row(
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 48.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            IconButton(onClick = {}, modifier = Modifier.size(56.dp)) {
-                Icon(
-                    imageVector = Icons.Default.SkipPrevious,
-                    contentDescription = "Previous",
-                    modifier = Modifier.fillMaxSize(),
-                )
-            }
-            FilledIconButton(onClick = {}, modifier = Modifier.size(72.dp)) {
-                Icon(
-                    imageVector = Icons.Default.PlayArrow,
-                    contentDescription = "Play / Pause",
-                    modifier = Modifier.size(36.dp),
-                )
-            }
-            IconButton(onClick = {}, modifier = Modifier.size(56.dp)) {
-                Icon(
-                    imageVector = Icons.Default.SkipNext,
-                    contentDescription = "Next",
-                    modifier = Modifier.fillMaxSize(),
-                )
             }
         }
     }

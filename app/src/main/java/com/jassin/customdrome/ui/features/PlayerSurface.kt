@@ -66,7 +66,7 @@ fun PlayerSurface(
         Box(
             modifier = Modifier.fillMaxSize(),
         ) {
-            FullPlayerContent(
+            FullscreenPlayer(
                 onCollapse = onCollapse,
                 progress = ((progress - 0.3f) / 0.7f).coerceIn(0f, 1f),
             )
