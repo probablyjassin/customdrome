@@ -48,8 +48,8 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.jassin.customdrome.TopBar
-import com.jassin.customdrome.ui.bottomBar.TabsBar
+import com.jassin.customdrome.ui.common.TabsBar
+import com.jassin.customdrome.ui.common.TopBar
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 

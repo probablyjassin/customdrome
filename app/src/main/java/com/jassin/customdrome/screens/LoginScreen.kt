@@ -1,5 +1,6 @@
-package com.jassin.customdrome
+package com.jassin.customdrome.screens
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -37,6 +38,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import com.jassin.customdrome.UserPreferences
 import com.jassin.customdrome.ui.theme.CustomDromeTheme
 import kotlinx.coroutines.launch
 
@@ -44,7 +46,7 @@ import kotlinx.coroutines.launch
 fun LoginScreen(
     onLogin: () -> Unit,
     onBack: () -> Unit,
-    userPrefs: UserPreferences
+    userPrefs: UserPreferences,
 ) {
     CustomDromeTheme {
         val context = LocalContext.current
@@ -71,11 +73,12 @@ fun LoginScreen(
             scope.launch {
                 userPrefs.saveUsername(tempName)
                 userPrefs.saveServerURL((tempServerURL))
-                android.widget.Toast.makeText(
-                    context,
-                    "Login details saved",
-                    android.widget.Toast.LENGTH_LONG
-                ).show()
+                Toast
+                    .makeText(
+                        context,
+                        "Login details saved",
+                        Toast.LENGTH_LONG,
+                    ).show()
             }
             onLogin()
         }
