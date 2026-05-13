@@ -110,12 +110,8 @@ fun LoginScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
-                // var instanceUrl by remember { mutableStateOf("") }
-                // var username by remember { mutableStateOf("") }
-                // var password by remember { mutableStateOf("") }
-
                 Text(
-                    text = "Login to CustomDrome",
+                    text = "Sign into your Navidrome server",
                     color = MaterialTheme.colorScheme.primary,
                     style = MaterialTheme.typography.headlineMedium,
                 )
@@ -126,7 +122,7 @@ fun LoginScreen(
                     // This is the text that floats to the top corner
                     label = { Text("Server URL") },
                     // This only appears once you click and the label moves up
-                    placeholder = { Text("http://navidrome.int") },
+                    placeholder = { Text("https://navidrome.int") },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
                     leadingIcon = {
