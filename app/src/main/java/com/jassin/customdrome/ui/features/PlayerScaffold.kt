@@ -7,6 +7,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -147,7 +148,13 @@ fun PlayerScaffold(
                                     }
                                 },
                             )
-                        }.clickable(enabled = progress < 0.5f) {
+                        }.clickable(
+                            enabled = progress < 0.5f,
+                            // This tracks the interaction state (press, drag, etc.)
+                            interactionSource = remember { MutableInteractionSource() },
+                            // This defines the visual effect. Setting it to null removes the circle/ripple.
+                            indication = null,
+                        ) {
                             scope.launch { expandProgress.animateTo(1f, tween(60)) }
                         },
             )
