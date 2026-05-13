@@ -1,5 +1,6 @@
 package com.jassin.customdrome.ui.features
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.VectorConverter
@@ -34,6 +35,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -45,6 +47,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import com.jassin.customdrome.TopBar
 import com.jassin.customdrome.ui.bottomBar.TabsBar
 import kotlinx.coroutines.launch
@@ -60,10 +63,6 @@ fun PlayerScaffold(
     showNavBars: Boolean,
     content: @Composable (PaddingValues) -> Unit,
 ) {
-    if (showNavBars) {
-        TopBar(onGoToSettings = { navController.navigate(route = "settings") })
-    }
-
     val isSongPlaying = true // ← swap for real state later
 
     // 0 = fully collapsed, 1 = fully expanded.
@@ -71,6 +70,11 @@ fun PlayerScaffold(
     // then animateTo() the nearest target on release for a springy snap.
     val expandProgress = remember { Animatable(0f, Float.VectorConverter) }
     val scope = rememberCoroutineScope()
+
+    // Top Navbar (only show on the main pages)
+    if (showNavBars) {
+        TopBar(onGoToSettings = { navController.navigate(route = "settings") })
+    }
 
     BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
         val density = LocalDensity.current
@@ -97,8 +101,6 @@ fun PlayerScaffold(
             TabsBar(navController)
         }
 
-        // TODO: take the miniplayer into a different file and make its display conditional alongside the bottom navbar
-
         // ── Player surface ────────────────────────────────────────────────────
         if (isSongPlaying) {
             val progress = expandProgress.value
@@ -108,6 +110,15 @@ fun PlayerScaffold(
             val cornerRadius = (16.dp * (1f - progress)).coerceAtLeast(0.dp)
 
             var startProgress by remember { mutableFloatStateOf(0f) }
+
+            // Re-register the BackHandler on every navigation change so it always
+            // sits on top of the OnBackPressedDispatcher stack (LIFO wins).
+            val currentEntry by navController.currentBackStackEntryAsState()
+            key(currentEntry) {
+                BackHandler(enabled = expandProgress.value > 0.5f) {
+                    scope.launch { expandProgress.animateTo(0f, tween(300)) }
+                }
+            }
 
             PlayerSurface(
                 progress = progress,
