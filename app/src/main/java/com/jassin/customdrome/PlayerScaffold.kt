@@ -46,6 +46,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.jassin.customdrome.bottomBar.TabsBar
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
@@ -92,7 +93,7 @@ fun PlayerScaffold(
                     .align(Alignment.BottomCenter)
                     .offset { IntOffset(0, navYOffsetPx) },
         ) {
-            BottomBar(navController)
+            TabsBar(navController)
         }
 
         // TODO: take the miniplayer into a different file and make its display conditional alongside the bottom navbar

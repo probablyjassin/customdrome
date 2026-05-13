@@ -1,4 +1,4 @@
-package com.jassin.customdrome
+package com.jassin.customdrome.bottomBar
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
@@ -50,7 +50,7 @@ sealed class Screen(
 }
 
 @Composable
-fun BottomBar(navController: NavHostController) {
+fun TabsBar(navController: NavHostController) {
     val items =
         listOf(
             Screen.Home,
@@ -118,7 +118,7 @@ fun MusicAppScreen(navController: NavHostController) {
                 enter = slideInVertically(initialOffsetY = { it }, animationSpec = tween(300)),
                 exit = slideOutVertically(targetOffsetY = { it }, animationSpec = tween(300)),
             ) {
-                BottomBar(navController)
+                TabsBar(navController)
             }
         }
 

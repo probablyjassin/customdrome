@@ -31,7 +31,7 @@ fun AppNavigation(userPrefs: UserPreferences) {
         },
         bottomBar = {
             if (showNavElements()) {
-                BottomBar(navController)
+                TabsBar(navController)
             }
         },
     ) { innerPadding ->*/
