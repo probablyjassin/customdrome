@@ -76,21 +76,23 @@ fun LoginScreen(
     val onFinishAction = {
         keyboardController?.hide()
         scope.launch {
-            userPrefs.saveUsername(tempName)
-            userPrefs.saveServerURL(tempServerURL)
-            userPrefs.savePassword(tempPassword)
-            Toast
-                .makeText(
-                    context,
-                    "Login details saved",
-                    Toast.LENGTH_LONG,
-                ).show()
-            val token = authViewModel.login(tempServerURL, tempName, tempPassword)
-            if (token != null) {
-                userPrefs.saveToken(token)
+            val loginData = authViewModel.login(tempServerURL, tempName, tempPassword)
+            if (loginData != null) {
+                userPrefs.saveUsername(tempName)
+                userPrefs.saveServerURL(tempServerURL)
+                userPrefs.savePassword(tempPassword)
+                userPrefs.saveToken(loginData.token)
+                userPrefs.saveSubsonicToken(loginData.subsonicToken)
+                loginData.subsonicSalt?.let { userPrefs.saveSubsonicSalt(it) }
+                Toast
+                    .makeText(
+                        context,
+                        "Login details saved",
+                        Toast.LENGTH_LONG,
+                    ).show()
+                onLogin()
             }
         }
-        // onLogin()
     }
 
     // responsible for the themed bg color

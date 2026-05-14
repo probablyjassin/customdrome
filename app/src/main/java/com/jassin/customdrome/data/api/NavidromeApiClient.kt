@@ -4,6 +4,7 @@ import android.util.Log
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.header
+import io.ktor.client.request.parameter
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.isSuccess
 import kotlinx.serialization.Serializable
@@ -61,4 +62,37 @@ class NavidromeApiClient {
         serverUrl: String,
         token: String,
     ): Int = fetchSongs(serverUrl, token).size
+
+    suspend fun fetchCoverArt(
+        serverUrl: String,
+        username: String,
+        subsonicToken: String,
+        subsonicSalt: String,
+        songId: String,
+        apiVersion: String = "1.16.1",
+        clientName: String = "CustomDrome",
+    ): ByteArray? {
+        val baseUrl = serverUrl.trimEnd('/')
+        val response =
+            client.get("$baseUrl/rest/getCoverArt") {
+                parameter("u", username)
+                parameter("t", subsonicToken)
+                parameter("s", subsonicSalt)
+                parameter("v", apiVersion)
+                parameter("c", clientName)
+                parameter("id", songId)
+            }
+
+        if (!response.status.isSuccess()) {
+            Log.d("NavidromeApiClient", "fetchCoverArt failed: ${response.status}")
+            return null
+        }
+
+        return try {
+            response.body()
+        } catch (e: Exception) {
+            Log.e("NavidromeApiClient", "Error reading cover art bytes", e)
+            null
+        }
+    }
 }

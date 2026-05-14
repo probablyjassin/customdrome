@@ -1,6 +1,7 @@
 package com.jassin.customdrome.data.models
 
 import androidx.lifecycle.ViewModel
+import com.jassin.customdrome.data.api.HttpClientProvider
 import io.ktor.client.call.body
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
@@ -8,21 +9,16 @@ import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
-import com.jassin.customdrome.data.api.HttpClientProvider
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
-import java.security.SecureRandom
-import java.security.cert.X509Certificate
-import javax.net.ssl.SSLContext
-import javax.net.ssl.X509TrustManager
 
 @Serializable
 data class LoginResponse(
     val id: String,
     val isAdmin: Boolean,
     val subsonicToken: String,
+    val subsonicSalt: String? = null,
     val token: String,
     val name: String,
 )
@@ -46,7 +42,7 @@ class AuthViewModel : ViewModel() {
         serverUrl: String,
         username: String,
         password: String,
-    ): String? {
+    ): LoginResponse? {
         try {
             val base = serverUrl.trimEnd('/')
             val url = "$base/auth/login"
@@ -77,7 +73,7 @@ class AuthViewModel : ViewModel() {
                 val loginData: LoginResponse = response.body()
 
                 _result.value = "Success! Welcome ${loginData.name}. Debug: Your token is: ${loginData.token}"
-                return loginData.token
+                return loginData
             } else {
                 _result.value = "Login failed: ${response.status}"
             }
