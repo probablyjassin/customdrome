@@ -22,7 +22,6 @@ class UserPreferences(
         val SUBSONIC_SALT: Preferences.Key<String> = stringPreferencesKey("subsonic_salt")
     }
 
-    // Read values (as a Flow)
     val userName: Flow<String?> = context.dataStore.data.map { it[USER_NAME] }
     val serverURL: Flow<String?> = context.dataStore.data.map { it[SERVER_URL] }
     val password: Flow<String?> = context.dataStore.data.map { it[PASSWORD] }
@@ -30,7 +29,6 @@ class UserPreferences(
     val subsonicToken: Flow<String?> = context.dataStore.data.map { it[SUBSONIC_TOKEN] }
     val subsonicSalt: Flow<String?> = context.dataStore.data.map { it[SUBSONIC_SALT] }
 
-    // Save values
     suspend fun saveUsername(name: String) {
         context.dataStore.edit { it[USER_NAME] = name }
     }

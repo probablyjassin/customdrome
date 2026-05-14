@@ -33,12 +33,11 @@ fun HomeScreen(
 ) {
     val context = LocalContext.current
 
-    // Build small dependency graph here; memoize to avoid re-creating on recomposition
+    // memoize to avoid re-creating on recomposition
     val apiClient = remember { NavidromeApiClient() }
     val songCacheDatabase = remember { SongCacheDatabase(context.applicationContext) }
     val homeRepository = remember(userPrefs, songCacheDatabase) { HomeRepository(userPrefs, apiClient, songCacheDatabase) }
 
-    // Inline factory so we can use viewModel() and keep lifecycle integration
     val vm: HomeScreenViewModel =
         viewModel(
             factory =

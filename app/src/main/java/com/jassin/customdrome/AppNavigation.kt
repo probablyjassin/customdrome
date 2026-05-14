@@ -12,8 +12,8 @@ import androidx.navigation.compose.rememberNavController
 import com.jassin.customdrome.screens.HomeScreen
 import com.jassin.customdrome.screens.LoginScreen
 import com.jassin.customdrome.screens.Playlists
-import com.jassin.customdrome.screens.Songs
 import com.jassin.customdrome.screens.SettingsScreen
+import com.jassin.customdrome.screens.Songs
 import com.jassin.customdrome.ui.features.PlayerScaffold
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -21,7 +21,8 @@ import com.jassin.customdrome.ui.features.PlayerScaffold
 fun AppNavigation(userPrefs: UserPreferences) {
     val navController = rememberNavController()
 
-    // We need to track the "current route" to decide when to show the bar
+    // keep track of current route
+    // conditionally show nav elements
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
@@ -41,6 +42,7 @@ fun AppNavigation(userPrefs: UserPreferences) {
                     userPrefs = userPrefs,
                 )
             }
+
             composable("login") {
                 LoginScreen(
                     onLogin = {

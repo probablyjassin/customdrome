@@ -48,15 +48,16 @@ fun PlayerScaffold(
     showNavBars: Boolean,
     content: @Composable (PaddingValues) -> Unit,
 ) {
-    val isSongPlaying = true // ← swap for real state later
-
-    // 0 = fully collapsed, 1 = fully expanded.
-    // snapTo() on every drag frame so the sheet follows the finger exactly,
-    // then animateTo() the nearest target on release for a springy snap.
-    val expandProgress = remember { Animatable(0f, Float.VectorConverter) }
     val scope = rememberCoroutineScope()
 
-    // Top Navbar (only show on the main pages) ──────────────────────────────────
+    val isSongPlaying = true // TODO
+
+    // animation logic for the miniplayer -> fullscreen player transition
+    // 0 = collapsed, 1 = expanded
+    // snapTo() on every drag frame so the sheet follows the finger
+    val expandProgress = remember { Animatable(0f, Float.VectorConverter) }
+
+    // top nav
     if (showNavBars) {
         TopBar(onGoToSettings = { navController.navigate(route = "settings") })
     }
@@ -72,10 +73,10 @@ fun PlayerScaffold(
         val travelPx =
             screenHeightPx - miniPlayerHeightPx - bottomNavHeightPx - with(density) { 15.dp.toPx() }
 
-        // Main content
+        // main content
         content(PaddingValues(bottom = BottomNavHeight))
 
-        // Bottom navbar
+        // bottom navbar
         if (showNavBars) {
             Box(
                 modifier =
@@ -85,16 +86,15 @@ fun PlayerScaffold(
                 TabsBar(navController)
             }
 
-            // Player surface
+            // player surface
             if (isSongPlaying) {
                 val progress = expandProgress.value
-                val p = progress
 
                 val topCurve = 1f
                 val heightCurve = 0.72f
 
-                val topP = p.powCurve(topCurve)
-                val heightP = p.powCurve(heightCurve)
+                val topP = progress.powCurve(topCurve)
+                val heightP = progress.powCurve(heightCurve)
 
                 val playerTopPx = travelPx * (1f - topP)
                 val playerHeightPx =
