@@ -6,8 +6,9 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import com.jassin.customdrome.data.api.SongDto
 
-class SongCacheDatabase(context: Context) :
-    SQLiteOpenHelper(context, DB_NAME, null, DB_VERSION) {
+class SongCacheDatabase(
+    context: Context,
+) : SQLiteOpenHelper(context, DB_NAME, null, DB_VERSION) {
     override fun onCreate(db: SQLiteDatabase) {
         db.execSQL(
             """
@@ -51,12 +52,35 @@ class SongCacheDatabase(context: Context) :
 
     fun isSongsCacheInitialized(): Boolean {
         val db = readableDatabase
-        db.rawQuery(
-            "SELECT cache_value FROM cache_meta WHERE cache_key = ?",
-            arrayOf(SONGS_CACHE_KEY),
-        ).use { cursor ->
-            return cursor.moveToFirst() && cursor.getInt(0) == 1
+        db
+            .rawQuery(
+                "SELECT cache_value FROM cache_meta WHERE cache_key = ?",
+                arrayOf(SONGS_CACHE_KEY),
+            ).use { cursor ->
+                return cursor.moveToFirst() && cursor.getInt(0) == 1
+            }
+    }
+
+    fun getAllSongs(): List<SongDto> {
+        val db = readableDatabase
+        val songs = mutableListOf<SongDto>()
+
+        db.rawQuery("SELECT id, title, album, artist, year, genre FROM songs", null).use { cursor ->
+            while (cursor.moveToNext()) {
+                songs.add(
+                    SongDto(
+                        id = cursor.getString(cursor.getColumnIndexOrThrow("id")),
+                        title = cursor.getString(cursor.getColumnIndexOrThrow("title")),
+                        album = cursor.getString(cursor.getColumnIndexOrThrow("album")),
+                        artist = cursor.getString(cursor.getColumnIndexOrThrow("artist")),
+                        year = cursor.getInt(cursor.getColumnIndexOrThrow("year")),
+                        genre = cursor.getString(cursor.getColumnIndexOrThrow("genre")),
+                    ),
+                )
+            }
         }
+
+        return songs
     }
 
     fun replaceAllSongs(songs: List<SongDto>) {
@@ -65,21 +89,23 @@ class SongCacheDatabase(context: Context) :
         try {
             db.delete("songs", null, null)
             songs.forEach { song ->
-                val row = ContentValues().apply {
-                    put("id", song.id ?: "")
-                    put("title", song.title)
-                    put("album", song.album)
-                    put("artist", song.artist)
-                    put("year", song.year)
-                    put("genre", song.genre)
-                }
+                val row =
+                    ContentValues().apply {
+                        put("id", song.id ?: "")
+                        put("title", song.title)
+                        put("album", song.album)
+                        put("artist", song.artist)
+                        put("year", song.year)
+                        put("genre", song.genre)
+                    }
                 db.insert("songs", null, row)
             }
 
-            val meta = ContentValues().apply {
-                put("cache_key", SONGS_CACHE_KEY)
-                put("cache_value", 1)
-            }
+            val meta =
+                ContentValues().apply {
+                    put("cache_key", SONGS_CACHE_KEY)
+                    put("cache_value", 1)
+                }
             db.insertWithOnConflict("cache_meta", null, meta, SQLiteDatabase.CONFLICT_REPLACE)
 
             db.setTransactionSuccessful()

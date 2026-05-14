@@ -1,27 +1,63 @@
 package com.jassin.customdrome.ui.common
 
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.util.Log
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import com.jassin.customdrome.data.repository.SongsRepository
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 @Composable
 fun SingleSongDisplay(
     title: String,
     artist: String,
-    cover: ByteArray? = null,
+    songId: String,
+    songsRepository: SongsRepository,
+    onCoverLoaded: (songId: String, coverBytes: ByteArray) -> Unit = { _, _ -> },
+    cachedCover: ByteArray? = null,
 ) {
-    Row {
-        cover?.let { bytes ->
-            val bmp = remember(bytes) { BitmapFactory.decodeByteArray(bytes, 0, bytes.size) }
+    val coverBytes by produceState<ByteArray?>(initialValue = cachedCover, key1 = songId) {
+        Log.d("SingleSongDisplay", "produceState triggered for songId=$songId, cachedCover=${cachedCover != null}")
+        if (cachedCover != null) {
+            Log.d("SingleSongDisplay", "using parent cache for songId=$songId")
+            value = cachedCover
+        } else {
+            value =
+                withContext(Dispatchers.IO) {
+                    songsRepository.getCoverArtQueued(songId)
+                }
+            if (value != null) {
+                Log.d("SingleSongDisplay", "loaded cover for songId=$songId, notifying parent")
+                onCoverLoaded(songId, value!!)
+            }
+        }
+    }
+
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        if (coverBytes != null) {
+            val bmp =
+                remember(coverBytes) {
+                    decodeSampledBitmap(
+                        bytes = coverBytes!!,
+                    )
+                }
             bmp?.let {
                 Image(
                     bitmap = it.asImageBitmap(),
@@ -29,6 +65,24 @@ fun SingleSongDisplay(
                     modifier = Modifier.size(64.dp),
                     contentScale = ContentScale.Crop,
                 )
+            } ?: Box(
+                modifier =
+                    Modifier
+                        .size(64.dp)
+                        .background(Color.LightGray),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text("?")
+            }
+        } else {
+            Box(
+                modifier =
+                    Modifier
+                        .size(64.dp)
+                        .background(Color.LightGray),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text("…")
             }
         }
 
@@ -37,4 +91,39 @@ fun SingleSongDisplay(
             Text(text = artist)
         }
     }
+}
+
+private fun decodeSampledBitmap(bytes: ByteArray): Bitmap? {
+    if (bytes.isEmpty()) return null
+
+    val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+    BitmapFactory.decodeByteArray(bytes, 0, bytes.size, bounds)
+
+    val sampleSize = calculateInSampleSize(bounds.outWidth, bounds.outHeight)
+
+    val options =
+        BitmapFactory.Options().apply {
+            inJustDecodeBounds = false
+            inSampleSize = sampleSize
+            inPreferredConfig = Bitmap.Config.RGB_565
+        }
+
+    return BitmapFactory.decodeByteArray(bytes, 0, bytes.size, options)
+}
+
+private fun calculateInSampleSize(
+    width: Int,
+    height: Int,
+): Int {
+    var inSampleSize = 1
+    val reqWidth = 64
+    val reqHeight = 64
+    if (height > reqHeight || width > reqWidth) {
+        val halfHeight = height / 2
+        val halfWidth = width / 2
+        while (halfHeight / inSampleSize >= reqHeight && halfWidth / inSampleSize >= reqWidth) {
+            inSampleSize *= 2
+        }
+    }
+    return inSampleSize.coerceAtLeast(1)
 }

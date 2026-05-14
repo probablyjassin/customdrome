@@ -11,10 +11,10 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.jassin.customdrome.screens.HomeScreen
 import com.jassin.customdrome.screens.LoginScreen
+import com.jassin.customdrome.screens.Playlists
+import com.jassin.customdrome.screens.Songs
 import com.jassin.customdrome.screens.SettingsScreen
 import com.jassin.customdrome.ui.features.PlayerScaffold
-import com.jassin.customdrome.ui.tabs.Playlists
-import com.jassin.customdrome.ui.tabs.Songs
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -64,7 +64,7 @@ fun AppNavigation(userPrefs: UserPreferences) {
                 )
             }
 
-            composable(route = "songs") { Songs() }
+            composable(route = "songs") { Songs(userPrefs) }
 
             composable(route = "playlists") { Playlists() }
         }
