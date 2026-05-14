@@ -34,10 +34,10 @@ class NavidromeApiClient {
         return response.status.isSuccess()
     }
 
-    suspend fun fetchSongCount(
+    suspend fun fetchSongs(
         serverUrl: String,
         token: String,
-    ): Int {
+    ): List<SongDto> {
         val baseUrl = serverUrl.trimEnd('/')
         val response =
             client.get("$baseUrl/api/song") {
@@ -45,18 +45,20 @@ class NavidromeApiClient {
             }
 
         if (!response.status.isSuccess()) {
-            Log.d("NavidromeApiClient", "fetchSongCount failed: ${response.status}")
-            return 0
+            Log.d("NavidromeApiClient", "fetchSongs failed: ${response.status}")
+            return emptyList()
         }
 
         return try {
-            // Parse the response as a list of SongDto objects
-            val songs: List<SongDto> = response.body()
-            Log.d("NavidromeApiClient", "fetchSongCount success: ${songs.size} songs")
-            songs.size
+            response.body<List<SongDto>>()
         } catch (e: Exception) {
-            Log.e("NavidromeApiClient", "Error parsing song response", e)
-            0
+            Log.e("NavidromeApiClient", "Error parsing songs response", e)
+            emptyList()
         }
     }
+
+    suspend fun fetchSongCount(
+        serverUrl: String,
+        token: String,
+    ): Int = fetchSongs(serverUrl, token).size
 }

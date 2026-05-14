@@ -20,6 +20,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.jassin.customdrome.UserPreferences
 import com.jassin.customdrome.data.api.NavidromeApiClient
+import com.jassin.customdrome.data.local.SongCacheDatabase
 import com.jassin.customdrome.data.models.HomeLoadResult
 import com.jassin.customdrome.data.models.HomeScreenViewModel
 import com.jassin.customdrome.data.repository.AuthRepository
@@ -34,7 +35,8 @@ fun HomeScreen(
 
     // Build small dependency graph here; memoize to avoid re-creating on recomposition
     val apiClient = remember { NavidromeApiClient() }
-    val authRepo = remember(userPrefs) { AuthRepository(userPrefs, apiClient) }
+    val songCacheDatabase = remember { SongCacheDatabase(context.applicationContext) }
+    val authRepo = remember(userPrefs, songCacheDatabase) { AuthRepository(userPrefs, apiClient, songCacheDatabase) }
 
     // Inline factory so we can use viewModel() and keep lifecycle integration
     val vm: HomeScreenViewModel =
