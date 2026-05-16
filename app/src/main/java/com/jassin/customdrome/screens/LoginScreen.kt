@@ -1,6 +1,8 @@
 package com.jassin.customdrome.screens
 
+import android.app.Activity
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -50,6 +52,7 @@ fun LoginScreen(
     userPrefs: UserPreferences,
 ) {
     val context = LocalContext.current
+    val activity = context as? Activity
 
     val savedName by userPrefs.userName.collectAsState(initial = null)
     val savedServerURL by userPrefs.serverURL.collectAsState(initial = null)
@@ -188,10 +191,16 @@ fun LoginScreen(
                         Text("Login")
                     }
 
-                    Button(onClick = { onBack() }) {
-                        // Trigger the back action
+                    Button(onClick = { activity?.finish() ?: onBack() }) {
+                        // Trigger the back action. If we're on the login screen, finishing
+                        // the activity closes the app instead of navigating back to a
+                        // previous screen and potentially being routed back to login.
                         Text("Go Back")
                     }
+                }
+                // Intercept system back presses on the login screen and close the app.
+                BackHandler(enabled = true) {
+                    activity?.finish()
                 }
                 if (authResult != null) {
                     Text(
