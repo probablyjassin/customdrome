@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -83,7 +84,7 @@ fun Songs(userPrefs: UserPreferences) {
             } else {
                 val songs = state.songs
                 androidx.compose.foundation.lazy.LazyColumn(
-                    modifier = Modifier.fillMaxSize().safeDrawingPadding(),
+                    modifier = Modifier.fillMaxSize().safeDrawingPadding().padding(bottom = 80.dp),
                     contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
                     verticalArrangement = Arrangement.spacedBy(6.dp),
                 ) {
