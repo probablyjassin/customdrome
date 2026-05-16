@@ -16,6 +16,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
@@ -47,14 +48,17 @@ fun PlayerSurface(
                 .background(
                     color = MaterialTheme.colorScheme.surfaceVariant,
                     shape = RoundedCornerShape(topStart = cornerRadius, topEnd = cornerRadius),
-                ),
+                ).clip(RoundedCornerShape(topStart = cornerRadius, topEnd = cornerRadius)),
     ) {
         // miniplayer
         Box(
             modifier =
                 Modifier
                     .fillMaxSize()
-                    .graphicsLayer { alpha = (1f - progress * 2f).coerceIn(0f, 1f) },
+                    .graphicsLayer {
+                        alpha = (1f - progress * 10f).coerceIn(0f, 1f)
+                        translationY = -progress * 5000f
+                    },
         ) {
             MiniPlayerContent()
         }
