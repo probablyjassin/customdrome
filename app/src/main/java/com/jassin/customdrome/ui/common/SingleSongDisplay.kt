@@ -1,7 +1,6 @@
 package com.jassin.customdrome.ui.common
 
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -26,8 +25,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import coil.compose.AsyncImage
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.jassin.customdrome.data.repository.SongsRepository
@@ -74,40 +73,20 @@ fun SingleSongDisplay(
         val coverImageShape = RoundedCornerShape(7.dp)
 
         if (coverBytes != null) {
-            val bmp =
-                remember(coverBytes) {
-                    decodeSampledBitmap(
-                        bytes = coverBytes!!,
-                    )
-                }
-            bmp?.let {
-                Box(
-                    modifier =
-                        Modifier
-                            .size(56.dp)
-                            .clip(coverContainerShape)
-                            .background(MaterialTheme.colorScheme.surfaceVariant)
-                            .padding(0.dp),
-                ) {
-                    Image(
-                        bitmap = it.asImageBitmap(),
-                        contentDescription = "Album cover",
-                        modifier =
-                            Modifier
-                                .fillMaxSize()
-                                .clip(coverImageShape),
-                        contentScale = ContentScale.Crop,
-                    )
-                }
-            } ?: Box(
+            Box(
                 modifier =
                     Modifier
                         .size(56.dp)
                         .clip(coverContainerShape)
-                        .background(Color.LightGray),
-                contentAlignment = Alignment.Center,
+                        .background(MaterialTheme.colorScheme.surfaceVariant)
+                        .padding(0.dp),
             ) {
-                Text("?")
+                AsyncImage(
+                    model = coverBytes,
+                    contentDescription = "Album cover",
+                    modifier = Modifier.fillMaxSize().clip(coverImageShape),
+                    contentScale = ContentScale.Crop,
+                )
             }
         } else {
             Box(
@@ -139,37 +118,4 @@ fun SingleSongDisplay(
     }
 }
 
-private fun decodeSampledBitmap(bytes: ByteArray): Bitmap? {
-    if (bytes.isEmpty()) return null
-
-    val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
-    BitmapFactory.decodeByteArray(bytes, 0, bytes.size, bounds)
-
-    val sampleSize = calculateInSampleSize(bounds.outWidth, bounds.outHeight)
-
-    val options =
-        BitmapFactory.Options().apply {
-            inJustDecodeBounds = false
-            inSampleSize = sampleSize
-            inPreferredConfig = Bitmap.Config.RGB_565
-        }
-
-    return BitmapFactory.decodeByteArray(bytes, 0, bytes.size, options)
-}
-
-private fun calculateInSampleSize(
-    width: Int,
-    height: Int,
-): Int {
-    var inSampleSize = 1
-    val reqWidth = 64
-    val reqHeight = 64
-    if (height > reqHeight || width > reqWidth) {
-        val halfHeight = height / 2
-        val halfWidth = width / 2
-        while (halfHeight / inSampleSize >= reqHeight && halfWidth / inSampleSize >= reqWidth) {
-            inSampleSize *= 2
-        }
-    }
-    return inSampleSize.coerceAtLeast(1)
-}
+// decodeSampledBitmap moved to ui.util.ImageUtils

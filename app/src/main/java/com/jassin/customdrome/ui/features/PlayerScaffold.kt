@@ -143,6 +143,7 @@ fun PlayerScaffold(
                     onPrevious = { playbackManager.previous() },
                     onTogglePlayPause = { playbackManager.togglePlayPause() },
                     onNext = { playbackManager.next() },
+                    nowPlayingCoverBytes = playbackState.currentCoverArt,
                     dismissOffsetYPx = dismissOffsetY.value,
                     onCollapse = {
                         scope.launch {

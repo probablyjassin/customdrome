@@ -9,7 +9,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.Image
 import androidx.compose.material.icons.Icons
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.runtime.remember
+import com.jassin.customdrome.ui.util.decodeSampledBitmap
+import coil.compose.AsyncImage
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -37,6 +44,7 @@ fun PlayerSurface(
     onPrevious: () -> Unit,
     onTogglePlayPause: () -> Unit,
     onNext: () -> Unit,
+    nowPlayingCoverBytes: ByteArray? = null,
     onCollapse: () -> Unit,
     modifier: Modifier = Modifier,
     // Pixel offsets applied during a dismissal swipe (follow the finger)
@@ -153,12 +161,23 @@ fun PlayerSurface(
                         ),
                 contentAlignment = Alignment.Center,
             ) {
-                Icon(
-                    imageVector = Icons.Default.MusicNote,
-                    contentDescription = null,
-                    modifier = Modifier.size(icon),
-                    tint = MaterialTheme.colorScheme.onPrimary,
-                )
+                if (nowPlayingCoverBytes != null) {
+                    // Use Coil to load and decode the ByteArray off the UI thread
+                    val context = LocalContext.current
+                    AsyncImage(
+                        model = nowPlayingCoverBytes,
+                        contentDescription = "Album cover",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(corner)),
+                    )
+                } else {
+                    Icon(
+                        imageVector = Icons.Default.MusicNote,
+                        contentDescription = null,
+                        modifier = Modifier.size(icon),
+                        tint = MaterialTheme.colorScheme.onPrimary,
+                    )
+                }
             }
         }
     }

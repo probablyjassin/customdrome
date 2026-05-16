@@ -16,6 +16,7 @@ data class PlaybackState(
     val currentIndex: Int = -1,
     val isPlaying: Boolean = false,
     val positionMs: Long = 0L,
+    val currentCoverArt: ByteArray? = null,
 ) {
     val currentItem: PlaybackItem?
         get() = queue.getOrNull(currentIndex)

@@ -8,7 +8,12 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.Modifier
+import com.jassin.customdrome.data.api.NavidromeApiClient
+import com.jassin.customdrome.data.local.SongCacheDatabase
+import com.jassin.customdrome.data.local.CoverArtCache
+import com.jassin.customdrome.data.repository.SongsRepository
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -26,7 +31,15 @@ import com.jassin.customdrome.ui.features.PlayerScaffold
 @Composable
 fun AppNavigation(userPrefs: UserPreferences) {
     val navController = rememberNavController()
-    val playbackManager = remember { PlaybackManager() }
+    val context = LocalContext.current
+    val apiClient = remember { NavidromeApiClient() }
+    val songCacheDatabase = remember { SongCacheDatabase(context.applicationContext) }
+    val coverArtCache = remember { CoverArtCache(context.applicationContext) }
+    val songsRepository = remember(userPrefs, songCacheDatabase, coverArtCache) {
+        SongsRepository(userPrefs, apiClient, songCacheDatabase, coverArtCache)
+    }
+
+    val playbackManager = remember { PlaybackManager(coverFetcher = { id -> songsRepository.getCoverArtQueued(id) }) }
 
     // keep track of current route
     // conditionally show nav elements
