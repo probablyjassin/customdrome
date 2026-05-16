@@ -35,7 +35,6 @@ fun PlayerSurface(
 ) {
     val density = LocalDensity.current
 
-    val miniCoverSize = 48.dp
     val fullCoverSize = 350.dp
 
     Box(
@@ -75,35 +74,59 @@ fun PlayerSurface(
             val containerWidth = maxWidth
             val containerHeight = maxHeight
 
-            // minimized: left, vertically centred
+            // minimized: left, with top gap
             val miniX = 12.dp
-            val miniY = (72.dp - miniCoverSize) / 2 // = 12 dp
+            val miniY = 8.dp
+            val miniSize = 48.dp
+
+            // middle state: intermediate position and size
+            val middleX = 12.dp
+            val middleY = 0.dp
+            val middleSize = 350.dp
 
             // fullscreen: centred
             val fullX = (containerWidth - fullCoverSize) / 2
             val fullY = (containerHeight - fullCoverSize) / 7 - 24.dp
 
-            val coverSize = lerp(miniCoverSize, fullCoverSize, progress)
-            val coverX = lerp(miniX, fullX, progress)
-            val coverY = lerp(miniY, fullY, progress)
-            val coverCorner = lerp(8.dp, 20.dp, progress)
-            val iconSize = lerp(24.dp, 80.dp, progress)
+            // Determine which leg of animation we're in and interpolate accordingly
+            val size: Dp
+            val x: Dp
+            val y: Dp
+            val corner: Dp
+            val icon: Dp
+
+            if (progress < 0.5f) {
+                val legProgress = progress / 0.5f
+                size = lerp(miniSize, middleSize, legProgress)
+                x = lerp(miniX, middleX, legProgress)
+                y = lerp(miniY, middleY, legProgress)
+                corner = lerp(8.dp, 16.dp, legProgress)
+                icon = lerp(24.dp, 50.dp, legProgress)
+            } else {
+                // Second half: middle to full
+                val legProgress = (progress - 0.5f) / 0.5f
+                size = lerp(middleSize, fullCoverSize, legProgress)
+                x = lerp(middleX, fullX, legProgress)
+                y = lerp(middleY, fullY, legProgress)
+                corner = lerp(16.dp, 20.dp, legProgress)
+                icon = lerp(50.dp, 80.dp, legProgress)
+            }
 
             Box(
                 modifier =
                     Modifier
-                        .size(coverSize)
-                        .offset(x = coverX, y = coverY)
+                        .size(size)
+                        .offset(x = x, y = y)
                         .background(
                             color = MaterialTheme.colorScheme.primary,
-                            shape = RoundedCornerShape(coverCorner),
+                            shape = RoundedCornerShape(corner),
                         ),
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(
                     imageVector = Icons.Default.MusicNote,
                     contentDescription = null,
-                    modifier = Modifier.size(iconSize),
+                    modifier = Modifier.size(icon),
                     tint = MaterialTheme.colorScheme.onPrimary,
                 )
             }
