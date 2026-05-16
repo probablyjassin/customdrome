@@ -85,7 +85,7 @@ fun PlayerSurface(
 
             // middle state: intermediate position and size
             val middleX = 12.dp
-            val middleY = 0.dp
+            val middleY = 10.dp
             val middleSize = 350.dp
 
             // fullscreen: centred
