@@ -114,6 +114,8 @@ fun PlayerScaffold(
                 val cornerRadius = (16.dp * (1f - progress)).coerceAtLeast(0.dp)
 
                 var startProgress by remember { mutableFloatStateOf(0f) }
+                var startedFromCollapsed by remember { mutableStateOf(false) }
+                var didDownwardDismiss by remember { mutableStateOf(false) }
 
                 // BackHandler re-registered on every navigation change
                 val currentEntry by navController.currentBackStackEntryAsState()
@@ -149,12 +151,15 @@ fun PlayerScaffold(
                                     onDragStart = {
                                         scope.launch { expandProgress.stop() }
                                         startProgress = expandProgress.value
+                                        startedFromCollapsed = expandProgress.value < 0.15f
+                                        didDownwardDismiss = false
                                     },
                                     onVerticalDrag = { change, dragAmount ->
                                         change.consume()
                                         when {
-                                            // Only allow dismissal when collapsed-ish and dragging downward.
-                                            expandProgress.value < 0.15f && dragAmount > 0f -> {
+                                            // A gesture that starts collapsed and moves downward is a dismissal attempt.
+                                            startedFromCollapsed && dragAmount > 0f -> {
+                                                didDownwardDismiss = true
                                                 isDismissing = true
                                                 scope.launch {
                                                     dismissOffsetY.snapTo(
@@ -163,13 +168,19 @@ fun PlayerScaffold(
                                                 }
                                             }
 
-                                            // Upward drag should expand the player.
-                                            dragAmount < 0f -> {
+                                            // If the user reverses a dismissal gesture, just return to the mini-player.
+                                            startedFromCollapsed && didDownwardDismiss && dragAmount < 0f -> {
+                                                scope.launch {
+                                                    dismissOffsetY.snapTo(
+                                                        (dismissOffsetY.value + dragAmount).coerceAtLeast(0f),
+                                                    )
+                                                }
+                                            }
+
+                                            // Upward drag from the collapsed state should expand the player.
+                                            startedFromCollapsed && dragAmount < 0f && !didDownwardDismiss -> {
                                                 isDismissing = false
                                                 scope.launch {
-                                                    if (dismissOffsetY.value != 0f) {
-                                                        dismissOffsetY.snapTo(0f)
-                                                    }
                                                     val delta = -dragAmount / travelPx
                                                     expandProgress.snapTo(
                                                         (expandProgress.value + delta).coerceIn(0f, 1f),
@@ -189,25 +200,35 @@ fun PlayerScaffold(
                                         }
                                     },
                                     onDragEnd = {
-                                        if (isDismissing) {
+                                        if (startedFromCollapsed) {
                                             // decide whether to dismiss based on vertical travel
                                             val threshold = with(density) { 120.dp.toPx() }
-                                            if (dismissOffsetY.value > threshold) {
-                                                // animate off-screen to bottom-right then mark not playing
-                                                val targetY = screenHeightPx + 400f
-                                                scope.launch {
-                                                    dismissOffsetY.animateTo(targetY, tween(300))
-                                                    // hide player (user will add actual stop later)
-                                                    isSongPlaying = false
-                                                    // reset offsets just in case
-                                                    dismissOffsetY.snapTo(0f)
-                                                    isDismissing = false
+                                            if (didDownwardDismiss) {
+                                                if (dismissOffsetY.value > threshold) {
+                                                    // animate off-screen to bottom-right then mark not playing
+                                                    val targetY = screenHeightPx + 400f
+                                                    scope.launch {
+                                                        dismissOffsetY.animateTo(targetY, tween(300))
+                                                        // hide player (user will add actual stop later)
+                                                        isSongPlaying = false
+                                                        // reset offsets just in case
+                                                        dismissOffsetY.snapTo(0f)
+                                                        isDismissing = false
+                                                    }
+                                                } else {
+                                                    // animate back to original position
+                                                    scope.launch {
+                                                        dismissOffsetY.animateTo(0f, tween(200))
+                                                        isDismissing = false
+                                                    }
                                                 }
                                             } else {
-                                                // animate back to original position
+                                                val target = if (expandProgress.value > startProgress) 1f else 0f
                                                 scope.launch {
-                                                    dismissOffsetY.animateTo(0f, tween(200))
-                                                    isDismissing = false
+                                                    expandProgress.animateTo(
+                                                        target,
+                                                        tween(60, easing = LinearEasing),
+                                                    )
                                                 }
                                             }
                                         } else {
@@ -225,6 +246,8 @@ fun PlayerScaffold(
                                         scope.launch {
                                             dismissOffsetY.animateTo(0f, tween(200))
                                             isDismissing = false
+                                            startedFromCollapsed = false
+                                            didDownwardDismiss = false
                                         }
                                     },
                                 )
