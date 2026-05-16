@@ -70,7 +70,7 @@ fun TabsBar(navController: NavHostController) {
                 selected = currentRoute == screen.route,
                 onClick = {
                     navController.navigate(screen.route) {
-                        popUpTo(navController.graph.startDestinationId) {
+                        popUpTo(navController.graph.id) {
                             saveState = true
                         }
                         launchSingleTop = true
