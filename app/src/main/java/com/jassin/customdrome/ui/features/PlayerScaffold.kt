@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableFloatStateOf
@@ -27,6 +28,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.jassin.customdrome.playback.PlaybackManager
 import com.jassin.customdrome.ui.common.TabsBar
 import com.jassin.customdrome.ui.common.TopBar
 import kotlinx.coroutines.launch
@@ -48,11 +50,13 @@ private fun Float.powCurve(exponent: Float): Float =
 fun PlayerScaffold(
     navController: NavHostController,
     showNavBars: Boolean,
+    playbackManager: PlaybackManager,
     content: @Composable (PaddingValues) -> Unit,
 ) {
     val scope = rememberCoroutineScope()
 
-    var isSongPlaying by remember { mutableStateOf(true) } // TODO: wire to real player
+    val playbackState by playbackManager.state.collectAsState()
+    val currentSong = playbackState.currentItem
 
     val dismissOffsetY = remember { Animatable(0f) }
 
@@ -96,7 +100,7 @@ fun PlayerScaffold(
             }
 
             // player surface
-            if (isSongPlaying) {
+            if (currentSong != null) {
                 val progress = expandProgress.value
 
                 val topCurve = 1f
@@ -133,6 +137,12 @@ fun PlayerScaffold(
                     playerHeightPx = playerHeightPx,
                     playerTopPx = playerTopPx,
                     cornerRadius = cornerRadius,
+                    nowPlayingTitle = currentSong.title,
+                    nowPlayingArtist = currentSong.artist,
+                    isPlaying = playbackState.isPlaying,
+                    onPrevious = { playbackManager.previous() },
+                    onTogglePlayPause = { playbackManager.togglePlayPause() },
+                    onNext = { playbackManager.next() },
                     dismissOffsetYPx = dismissOffsetY.value,
                     onCollapse = {
                         scope.launch {
@@ -205,8 +215,8 @@ fun PlayerScaffold(
                                                     val targetY = screenHeightPx + 400f
                                                     scope.launch {
                                                         dismissOffsetY.animateTo(targetY, tween(300))
-                                                        // hide player (user will add actual stop later)
-                                                        isSongPlaying = false
+                                                        // Dismiss currently clears queue until playback engine is wired.
+                                                        playbackManager.clearQueue()
                                                         // reset offsets just in case
                                                         dismissOffsetY.snapTo(0f)
                                                     }

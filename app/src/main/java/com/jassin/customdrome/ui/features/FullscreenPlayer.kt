@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.SkipNext
 import androidx.compose.material.icons.filled.SkipPrevious
@@ -24,12 +25,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 
 @Composable
 fun FullscreenPlayer(
     onCollapse: () -> Unit,
     progress: Float,
+    title: String,
+    artist: String,
+    isPlaying: Boolean,
+    onPrevious: () -> Unit,
+    onTogglePlayPause: () -> Unit,
+    onNext: () -> Unit,
 ) {
     val p = progress.coerceIn(0f, 1f)
 
@@ -54,12 +62,19 @@ fun FullscreenPlayer(
                     },
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Text(text = "Song Title", style = MaterialTheme.typography.headlineSmall)
+            Text(
+                text = title,
+                style = MaterialTheme.typography.headlineSmall,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = "Artist Name",
+                text = artist,
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
             )
         }
 
@@ -78,21 +93,21 @@ fun FullscreenPlayer(
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            IconButton(onClick = {}, modifier = Modifier.size(56.dp)) {
+            IconButton(onClick = onPrevious, modifier = Modifier.size(56.dp)) {
                 Icon(
                     imageVector = Icons.Default.SkipPrevious,
                     contentDescription = "Previous",
                     modifier = Modifier.fillMaxSize(),
                 )
             }
-            FilledIconButton(onClick = {}, modifier = Modifier.size(72.dp)) {
+            FilledIconButton(onClick = onTogglePlayPause, modifier = Modifier.size(72.dp)) {
                 Icon(
-                    imageVector = Icons.Default.PlayArrow,
-                    contentDescription = "Play / Pause",
+                    imageVector = if (isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
+                    contentDescription = if (isPlaying) "Pause" else "Play",
                     modifier = Modifier.size(36.dp),
                 )
             }
-            IconButton(onClick = {}, modifier = Modifier.size(56.dp)) {
+            IconButton(onClick = onNext, modifier = Modifier.size(56.dp)) {
                 Icon(
                     imageVector = Icons.Default.SkipNext,
                     contentDescription = "Next",

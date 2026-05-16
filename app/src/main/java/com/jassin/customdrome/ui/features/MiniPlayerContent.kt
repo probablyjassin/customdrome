@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.SkipNext
 import androidx.compose.material.icons.filled.SkipPrevious
@@ -18,10 +19,18 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun MiniPlayerContent() {
+fun MiniPlayerContent(
+    title: String,
+    artist: String,
+    isPlaying: Boolean,
+    onPrevious: () -> Unit,
+    onTogglePlayPause: () -> Unit,
+    onNext: () -> Unit,
+) {
     Row(
         modifier =
             Modifier
@@ -35,25 +44,30 @@ fun MiniPlayerContent() {
 
         Column(modifier = Modifier.weight(1f)) {
             Text(
-                text = "Song Title",
+                text = title,
                 style = MaterialTheme.typography.bodyMedium,
                 maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
             )
             Text(
-                text = "Artist Name",
+                text = artist,
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
             )
         }
         Row(verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = {}) {
+            IconButton(onClick = onPrevious) {
                 Icon(Icons.Default.SkipPrevious, contentDescription = "Previous")
             }
-            IconButton(onClick = {}) {
-                Icon(Icons.Default.PlayArrow, contentDescription = "Play / Pause")
+            IconButton(onClick = onTogglePlayPause) {
+                Icon(
+                    imageVector = if (isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
+                    contentDescription = if (isPlaying) "Pause" else "Play",
+                )
             }
-            IconButton(onClick = {}) {
+            IconButton(onClick = onNext) {
                 Icon(Icons.Default.SkipNext, contentDescription = "Next")
             }
         }

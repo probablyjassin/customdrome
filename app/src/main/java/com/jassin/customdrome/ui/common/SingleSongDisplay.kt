@@ -5,6 +5,7 @@ import android.graphics.BitmapFactory
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -39,6 +40,7 @@ fun SingleSongDisplay(
     artist: String,
     songId: String,
     songsRepository: SongsRepository,
+    onClick: () -> Unit = {},
     onCoverLoaded: (songId: String, coverBytes: ByteArray) -> Unit = { _, _ -> },
     cachedCover: ByteArray? = null,
 ) {
@@ -64,6 +66,7 @@ fun SingleSongDisplay(
             Modifier
                 .fillMaxWidth()
                 .height(72.dp)
+                .clickable(onClick = onClick)
                 .padding(horizontal = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {

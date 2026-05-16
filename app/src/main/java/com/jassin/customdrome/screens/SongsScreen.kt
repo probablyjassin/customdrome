@@ -30,12 +30,15 @@ import com.jassin.customdrome.data.local.SongCacheDatabase
 import com.jassin.customdrome.data.models.SongsUiState
 import com.jassin.customdrome.data.models.SongsViewModel
 import com.jassin.customdrome.data.repository.SongsRepository
+import com.jassin.customdrome.playback.PlaybackManager
+import com.jassin.customdrome.playback.toPlaybackItem
 import com.jassin.customdrome.ui.common.SingleSongDisplay
 
 @androidx.compose.runtime.Composable
 fun Songs(
     userPrefs: UserPreferences,
     listState: LazyListState,
+    playbackManager: PlaybackManager,
 ) {
     val context = LocalContext.current
     val apiClient = remember { NavidromeApiClient() }
@@ -115,6 +118,12 @@ fun Songs(
                                 artist = song.artist,
                                 songId = song.id,
                                 songsRepository = songsRepository,
+                                onClick = {
+                                    playbackManager.playQueue(
+                                        queue = songs.map { it.toPlaybackItem() },
+                                        startIndex = index,
+                                    )
+                                },
                                 onCoverLoaded = { songId, coverBytes ->
                                     val current = coverCache.value
                                     if (!current.containsKey(songId)) {

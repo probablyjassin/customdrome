@@ -31,6 +31,12 @@ fun PlayerSurface(
     playerHeightPx: Float,
     playerTopPx: Float,
     cornerRadius: Dp,
+    nowPlayingTitle: String,
+    nowPlayingArtist: String,
+    isPlaying: Boolean,
+    onPrevious: () -> Unit,
+    onTogglePlayPause: () -> Unit,
+    onNext: () -> Unit,
     onCollapse: () -> Unit,
     modifier: Modifier = Modifier,
     // Pixel offsets applied during a dismissal swipe (follow the finger)
@@ -67,7 +73,14 @@ fun PlayerSurface(
                         translationY = -progress * 5000f
                     },
         ) {
-            MiniPlayerContent()
+            MiniPlayerContent(
+                title = nowPlayingTitle,
+                artist = nowPlayingArtist,
+                isPlaying = isPlaying,
+                onPrevious = onPrevious,
+                onTogglePlayPause = onTogglePlayPause,
+                onNext = onNext,
+            )
         }
 
         // fullscreen player
@@ -77,6 +90,12 @@ fun PlayerSurface(
             FullscreenPlayer(
                 onCollapse = onCollapse,
                 progress = ((progress - 0.3f) / 0.7f).coerceIn(0f, 1f),
+                title = nowPlayingTitle,
+                artist = nowPlayingArtist,
+                isPlaying = isPlaying,
+                onPrevious = onPrevious,
+                onTogglePlayPause = onTogglePlayPause,
+                onNext = onNext,
             )
         }
 

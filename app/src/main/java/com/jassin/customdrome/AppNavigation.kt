@@ -7,11 +7,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.jassin.customdrome.playback.PlaybackManager
 import com.jassin.customdrome.screens.HomeScreen
 import com.jassin.customdrome.screens.LoginScreen
 import com.jassin.customdrome.screens.Playlists
@@ -24,6 +26,7 @@ import com.jassin.customdrome.ui.features.PlayerScaffold
 @Composable
 fun AppNavigation(userPrefs: UserPreferences) {
     val navController = rememberNavController()
+    val playbackManager = remember { PlaybackManager() }
 
     // keep track of current route
     // conditionally show nav elements
@@ -32,7 +35,11 @@ fun AppNavigation(userPrefs: UserPreferences) {
 
     fun showNavElements(): Boolean = currentRoute != "login" && currentRoute != "settings"
 
-    PlayerScaffold(navController = navController, showNavElements()) { paddingValues ->
+    PlayerScaffold(
+        navController = navController,
+        showNavBars = showNavElements(),
+        playbackManager = playbackManager,
+    ) { paddingValues ->
         NavHost(
             navController = navController,
             startDestination = "splash",
@@ -87,7 +94,11 @@ fun AppNavigation(userPrefs: UserPreferences) {
                     }
                 }
 
-                Songs(userPrefs = userPrefs, listState = listState)
+                Songs(
+                    userPrefs = userPrefs,
+                    listState = listState,
+                    playbackManager = playbackManager,
+                )
             }
 
             composable(route = "playlists") { Playlists() }
