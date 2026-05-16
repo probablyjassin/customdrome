@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -51,7 +52,11 @@ fun PlayerScaffold(
 ) {
     val scope = rememberCoroutineScope()
 
-    val isSongPlaying = true // TODO
+    var isSongPlaying by remember { mutableStateOf(true) } // TODO: wire to real player
+
+    // dismissal offset (px) so the mini player follows a downward swipe and drifts right a bit
+    val dismissOffsetY = remember { Animatable(0f) }
+    var isDismissing by remember { mutableStateOf(false) }
 
     // animation logic for the miniplayer -> fullscreen player transition
     // 0 = collapsed, 1 = expanded
@@ -128,6 +133,7 @@ fun PlayerScaffold(
                     playerHeightPx = playerHeightPx,
                     playerTopPx = playerTopPx,
                     cornerRadius = cornerRadius,
+                    dismissOffsetYPx = dismissOffsetY.value,
                     onCollapse = {
                         scope.launch {
                             expandProgress.animateTo(
@@ -146,24 +152,79 @@ fun PlayerScaffold(
                                     },
                                     onVerticalDrag = { change, dragAmount ->
                                         change.consume()
-                                        val delta = -dragAmount / travelPx
-                                        scope.launch {
-                                            expandProgress.snapTo(
-                                                (expandProgress.value + delta).coerceIn(
-                                                    0f,
-                                                    1f,
-                                                ),
-                                            )
+                                        when {
+                                            // Only allow dismissal when collapsed-ish and dragging downward.
+                                            expandProgress.value < 0.15f && dragAmount > 0f -> {
+                                                isDismissing = true
+                                                scope.launch {
+                                                    dismissOffsetY.snapTo(
+                                                        (dismissOffsetY.value + dragAmount).coerceAtLeast(0f),
+                                                    )
+                                                }
+                                            }
+
+                                            // Upward drag should expand the player.
+                                            dragAmount < 0f -> {
+                                                isDismissing = false
+                                                scope.launch {
+                                                    if (dismissOffsetY.value != 0f) {
+                                                        dismissOffsetY.snapTo(0f)
+                                                    }
+                                                    val delta = -dragAmount / travelPx
+                                                    expandProgress.snapTo(
+                                                        (expandProgress.value + delta).coerceIn(0f, 1f),
+                                                    )
+                                                }
+                                            }
+
+                                            // Downward drag while not collapsed keeps the sheet behavior stable.
+                                            else -> {
+                                                val delta = -dragAmount / travelPx
+                                                scope.launch {
+                                                    expandProgress.snapTo(
+                                                        (expandProgress.value + delta).coerceIn(0f, 1f),
+                                                    )
+                                                }
+                                            }
                                         }
                                     },
                                     onDragEnd = {
-                                        val target =
-                                            if (expandProgress.value > startProgress) 1f else 0f
+                                        if (isDismissing) {
+                                            // decide whether to dismiss based on vertical travel
+                                            val threshold = with(density) { 120.dp.toPx() }
+                                            if (dismissOffsetY.value > threshold) {
+                                                // animate off-screen to bottom-right then mark not playing
+                                                val targetY = screenHeightPx + 400f
+                                                scope.launch {
+                                                    dismissOffsetY.animateTo(targetY, tween(300))
+                                                    // hide player (user will add actual stop later)
+                                                    isSongPlaying = false
+                                                    // reset offsets just in case
+                                                    dismissOffsetY.snapTo(0f)
+                                                    isDismissing = false
+                                                }
+                                            } else {
+                                                // animate back to original position
+                                                scope.launch {
+                                                    dismissOffsetY.animateTo(0f, tween(200))
+                                                    isDismissing = false
+                                                }
+                                            }
+                                        } else {
+                                            val target = if (expandProgress.value > startProgress) 1f else 0f
+                                            scope.launch {
+                                                expandProgress.animateTo(
+                                                    target,
+                                                    tween(60, easing = LinearEasing),
+                                                )
+                                            }
+                                        }
+                                    },
+                                    onDragCancel = {
+                                        // reset any dismissal offsets
                                         scope.launch {
-                                            expandProgress.animateTo(
-                                                target,
-                                                tween(60, easing = LinearEasing),
-                                            )
+                                            dismissOffsetY.animateTo(0f, tween(200))
+                                            isDismissing = false
                                         }
                                     },
                                 )

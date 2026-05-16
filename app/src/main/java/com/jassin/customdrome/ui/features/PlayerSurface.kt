@@ -31,8 +31,10 @@ fun PlayerSurface(
     playerHeightPx: Float,
     playerTopPx: Float,
     cornerRadius: Dp,
-    modifier: Modifier = Modifier,
     onCollapse: () -> Unit,
+    modifier: Modifier = Modifier,
+    // Pixel offsets applied during a dismissal swipe (follow the finger)
+    dismissOffsetYPx: Float = 0f,
 ) {
     val density = LocalDensity.current
 
@@ -43,8 +45,13 @@ fun PlayerSurface(
             Modifier
                 .fillMaxWidth()
                 .height(with(density) { playerHeightPx.toDp() })
-                .offset { IntOffset(0, playerTopPx.roundToInt()) }
-                .then(modifier)
+                // apply dismissal offsets in px so the surface can follow the finger
+                .offset {
+                    IntOffset(
+                        0,
+                        (playerTopPx + dismissOffsetYPx).roundToInt(),
+                    )
+                }.then(modifier)
                 .background(
                     color = MaterialTheme.colorScheme.onPrimaryFixedVariant,
                     shape = RoundedCornerShape(topStart = cornerRadius, topEnd = cornerRadius),
