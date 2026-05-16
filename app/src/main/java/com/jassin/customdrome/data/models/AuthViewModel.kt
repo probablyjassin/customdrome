@@ -86,7 +86,9 @@ class AuthViewModel : ViewModel() {
     }
 
     override fun onCleared() {
-        // Do not close the shared HttpClient here.
+        // NOT closing the shared HttpClient here
+        // was the cause of MANY HOURS OF HEADACHES grrrr
+        // LLM explanation on why:
         // The client provided by `HttpClientProvider` is a singleton for the
         // whole app. Closing it in a ViewModel causes later requests to fail
         // with "parent job is completed" / cancellation errors because the
