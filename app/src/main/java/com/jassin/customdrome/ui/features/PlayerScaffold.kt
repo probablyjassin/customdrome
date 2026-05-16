@@ -54,9 +54,7 @@ fun PlayerScaffold(
 
     var isSongPlaying by remember { mutableStateOf(true) } // TODO: wire to real player
 
-    // dismissal offset (px) so the mini player follows a downward swipe and drifts right a bit
     val dismissOffsetY = remember { Animatable(0f) }
-    var isDismissing by remember { mutableStateOf(false) }
 
     // animation logic for the miniplayer -> fullscreen player transition
     // 0 = collapsed, 1 = expanded
@@ -160,7 +158,6 @@ fun PlayerScaffold(
                                             // A gesture that starts collapsed and moves downward is a dismissal attempt.
                                             startedFromCollapsed && dragAmount > 0f -> {
                                                 didDownwardDismiss = true
-                                                isDismissing = true
                                                 scope.launch {
                                                     dismissOffsetY.snapTo(
                                                         (dismissOffsetY.value + dragAmount).coerceAtLeast(0f),
@@ -178,8 +175,7 @@ fun PlayerScaffold(
                                             }
 
                                             // Upward drag from the collapsed state should expand the player.
-                                            startedFromCollapsed && dragAmount < 0f && !didDownwardDismiss -> {
-                                                isDismissing = false
+                                            startedFromCollapsed && dragAmount < 0f -> {
                                                 scope.launch {
                                                     val delta = -dragAmount / travelPx
                                                     expandProgress.snapTo(
@@ -202,7 +198,7 @@ fun PlayerScaffold(
                                     onDragEnd = {
                                         if (startedFromCollapsed) {
                                             // decide whether to dismiss based on vertical travel
-                                            val threshold = with(density) { 120.dp.toPx() }
+                                            val threshold = with(density) { 20.dp.toPx() }
                                             if (didDownwardDismiss) {
                                                 if (dismissOffsetY.value > threshold) {
                                                     // animate off-screen to bottom-right then mark not playing
@@ -213,13 +209,11 @@ fun PlayerScaffold(
                                                         isSongPlaying = false
                                                         // reset offsets just in case
                                                         dismissOffsetY.snapTo(0f)
-                                                        isDismissing = false
                                                     }
                                                 } else {
                                                     // animate back to original position
                                                     scope.launch {
                                                         dismissOffsetY.animateTo(0f, tween(200))
-                                                        isDismissing = false
                                                     }
                                                 }
                                             } else {
@@ -245,7 +239,6 @@ fun PlayerScaffold(
                                         // reset any dismissal offsets
                                         scope.launch {
                                             dismissOffsetY.animateTo(0f, tween(200))
-                                            isDismissing = false
                                             startedFromCollapsed = false
                                             didDownwardDismiss = false
                                         }
