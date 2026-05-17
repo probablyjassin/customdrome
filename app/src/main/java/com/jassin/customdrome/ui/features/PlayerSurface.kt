@@ -1,6 +1,5 @@
 package com.jassin.customdrome.ui.features
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -15,14 +14,11 @@ import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
@@ -33,6 +29,7 @@ import kotlin.math.roundToInt
 
 @Composable
 fun PlayerSurface(
+    modifier: Modifier = Modifier,
     progress: Float,
     playerHeightPx: Float,
     playerTopPx: Float,
@@ -45,7 +42,6 @@ fun PlayerSurface(
     onNext: () -> Unit,
     nowPlayingCoverBytes: ByteArray? = null,
     onCollapse: () -> Unit,
-    modifier: Modifier = Modifier,
     // Pixel offsets applied during a dismissal swipe (follow the finger)
     dismissOffsetYPx: Float = 0f,
 ) {
@@ -162,7 +158,6 @@ fun PlayerSurface(
             ) {
                 if (nowPlayingCoverBytes != null) {
                     // Use Coil to load and decode the ByteArray off the UI thread
-                    val context = LocalContext.current
                     AsyncImage(
                         model = nowPlayingCoverBytes,
                         contentDescription = "Album cover",
