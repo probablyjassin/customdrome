@@ -61,6 +61,15 @@ fun PlayerScaffold(
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
 
+    fun doToast(text: String) {
+        Toast
+            .makeText(
+                context,
+                "$text",
+                Toast.LENGTH_SHORT,
+            ).show()
+    }
+
     val playbackState by playbackManager.state.collectAsState()
     val currentSong = playbackState.currentItem
 
@@ -178,7 +187,7 @@ fun PlayerScaffold(
                                         // so initial jitter doesn't classify an upward drag as downward dismiss.
                                         if (startedFromCollapsed && collapsedDragDirection == 0f) {
                                             collapsedDragAccumulatedY += dragAmount
-                                            val directionLockThresholdPx = with(density) { 6.dp.toPx() }
+                                            val directionLockThresholdPx = with(density) { 2.dp.toPx() }
                                             if (abs(collapsedDragAccumulatedY) >= directionLockThresholdPx) {
                                                 collapsedDragDirection = if (collapsedDragAccumulatedY > 0f) 1f else -1f
                                                 didDownwardDismiss = collapsedDragDirection > 0f
@@ -219,18 +228,12 @@ fun PlayerScaffold(
                                         val velocityY = velocityTracker?.calculateVelocity()?.y ?: 0f
 
                                         // thresholds
-                                        val distanceThreshold = with(density) { 20.dp.toPx() }
-                                        val velocityThreshold = 100f // px/sec
+                                        val distanceThreshold = with(density) { 1.dp.toPx() }
+                                        val velocityThreshold = 50f // px/sec
 
                                         if (startedFromCollapsed) {
                                             if (didDownwardDismiss) {
                                                 scope.launch {
-                                                    Toast
-                                                        .makeText(
-                                                            context,
-                                                            "dismissed",
-                                                            Toast.LENGTH_SHORT,
-                                                        ).show()
                                                 }
                                                 // Dismiss path: either sufficient distance or a downward fling
                                                 if (dismissOffsetY.value > distanceThreshold || velocityY > velocityThreshold) {
@@ -250,6 +253,7 @@ fun PlayerScaffold(
                                                 when {
                                                     // strong upward fling -> expand
                                                     velocityY < -velocityThreshold -> {
+                                                        doToast("up $velocityY")
                                                         scope.launch {
                                                             expandProgress.animateTo(1f, tween(300))
                                                         }
@@ -257,6 +261,7 @@ fun PlayerScaffold(
 
                                                     // strong downward fling -> collapse/don't expand
                                                     velocityY > velocityThreshold -> {
+                                                        doToast("down $velocityY")
                                                         scope.launch {
                                                             expandProgress.animateTo(0f, tween(300))
                                                         }
@@ -264,9 +269,15 @@ fun PlayerScaffold(
 
                                                     // otherwise decide by how far the finger moved relative to start
                                                     else -> {
-                                                        scope.launch { expandProgress.animateTo(0f, tween(200, easing = LinearEasing)) }
-                                                        /*val target = if (expandProgress.value > startProgress) 1f else 0f
-                                                        scope.launch { expandProgress.animateTo(target, tween(200, easing = LinearEasing)) }*/
+                                                        /*val target =
+                                                            if (
+                                                                expandProgress.value !in 0.45f..0.8f
+                                                            ) {
+                                                                1f
+                                                            } else {
+                                                                0f
+                                                            }*/
+                                                        scope.launch { expandProgress.animateTo(1f, tween(200, easing = LinearEasing)) }
                                                     }
                                                 }
                                             }
