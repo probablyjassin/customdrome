@@ -128,7 +128,7 @@ fun Songs(
                                         startIndex = index,
                                     )
                                 },
-                                onLongPress = { optionsSelectedSong = song },
+                                // onLongPress = { optionsSelectedSong = song },
                                 onCoverLoaded = { songId, coverBytes ->
                                     val current = coverCache.value
                                     if (!current.containsKey(songId)) {
