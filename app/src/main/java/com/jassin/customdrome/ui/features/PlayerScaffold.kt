@@ -23,6 +23,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.util.VelocityTracker
 import androidx.compose.ui.platform.LocalDensity
@@ -79,6 +80,7 @@ fun PlayerScaffold(
 
         val miniPlayerHeightPx = with(density) { MiniPlayerHeight.toPx() }
         val bottomNavHeightPx = with(density) { BottomNavHeight.toPx() }
+        val bottomNavHideDistancePx = bottomNavHeightPx + with(density) { 24.dp.toPx() }
 
         // total travel distance of the sheet's top edge
         val travelPx =
@@ -319,6 +321,9 @@ fun PlayerScaffold(
                 modifier =
                     Modifier
                         .align(Alignment.BottomCenter)
+                        .graphicsLayer {
+                            translationY = bottomNavHideDistancePx * expandProgress.value
+                        }
                         .zIndex(1f),
             ) {
                 TabsBar(navController)
