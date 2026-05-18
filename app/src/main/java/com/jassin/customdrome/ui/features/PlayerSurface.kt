@@ -40,6 +40,9 @@ fun PlayerSurface(
     onPrevious: () -> Unit,
     onTogglePlayPause: () -> Unit,
     onNext: () -> Unit,
+    currentPositionMs: Long = 0L,
+    durationMs: Long? = null,
+    onSeek: (Long) -> Unit = {},
     nowPlayingCoverBytes: ByteArray? = null,
     onCollapse: () -> Unit,
     // Pixel offsets applied during a dismissal swipe (follow the finger)
@@ -96,9 +99,12 @@ fun PlayerSurface(
                 title = nowPlayingTitle,
                 artist = nowPlayingArtist,
                 isPlaying = isPlaying,
+                currentPositionMs = currentPositionMs,
+                durationMs = durationMs,
                 onPrevious = onPrevious,
                 onTogglePlayPause = onTogglePlayPause,
                 onNext = onNext,
+                onSeek = onSeek,
             )
         }
 

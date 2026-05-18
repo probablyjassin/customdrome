@@ -19,6 +19,7 @@ data class PlaybackState(
     val currentIndex: Int = -1,
     val isPlaying: Boolean = false,
     val positionMs: Long = 0L,
+    val currentDurationMs: Long? = null,
     val currentCoverArt: ByteArray? = null,
 ) {
     val currentItem: PlaybackItem?

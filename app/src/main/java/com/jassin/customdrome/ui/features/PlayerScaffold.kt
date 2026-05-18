@@ -139,9 +139,12 @@ fun PlayerScaffold(
                     nowPlayingTitle = currentSong.title,
                     nowPlayingArtist = currentSong.artist,
                     isPlaying = playbackState.isPlaying,
+                    currentPositionMs = playbackState.positionMs,
+                    durationMs = playbackState.currentDurationMs,
                     onPrevious = { playbackManager.previous() },
                     onTogglePlayPause = { playbackManager.togglePlayPause() },
                     onNext = { playbackManager.next() },
+                    onSeek = playbackManager::seekTo,
                     nowPlayingCoverBytes = playbackState.currentCoverArt,
                     dismissOffsetYPx = dismissOffsetY.value,
                     onCollapse = {

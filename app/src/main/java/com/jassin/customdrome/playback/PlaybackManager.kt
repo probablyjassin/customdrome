@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import androidx.core.net.toUri
+import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.PlaybackException
@@ -137,6 +138,7 @@ class PlaybackManager(
                         currentIndex = resolvedStartIndex,
                         isPlaying = startPlaying,
                         positionMs = 0L,
+                        currentDurationMs = null,
                         currentCoverArt = null,
                     )
                 refreshCoverForCurrent()
@@ -322,6 +324,7 @@ class PlaybackManager(
                 currentIndex = currentIndex,
                 isPlaying = exoPlayer.isPlaying,
                 positionMs = exoPlayer.currentPosition.coerceAtLeast(0L),
+                currentDurationMs = exoPlayer.duration.takeIf { it > 0L && it != C.TIME_UNSET },
             )
         }
         Log.d(
