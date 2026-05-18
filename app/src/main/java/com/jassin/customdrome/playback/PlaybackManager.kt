@@ -241,8 +241,8 @@ class PlaybackManager(
             withContext(Dispatchers.Main.immediate) {
                 player.stop()
                 player.clearMediaItems()
+                PlaybackEngine.release()
             }
-            PlaybackEngine.release()
             observedPlayer = null
             _state.value = PlaybackState()
             stopPlaybackService()
