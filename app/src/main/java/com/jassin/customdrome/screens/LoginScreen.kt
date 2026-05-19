@@ -32,6 +32,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.autofill.ContentType
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.changedToDown
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.semantics.contentType
@@ -44,6 +47,34 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.jassin.customdrome.UserPreferences
 import com.jassin.customdrome.data.models.AuthViewModel
 import kotlinx.coroutines.launch
+
+fun Modifier.onTripleTap(onTripleTap: () -> Unit): Modifier = this.pointerInput(Unit) {
+    var tapCount = 0
+    var lastTapTime = 0L
+    val tripleTapTimeout = 300L // Milliseconds window to complete the next tap
+
+    awaitPointerEventScope {
+        while (true) {
+            val event = awaitPointerEvent(PointerEventPass.Initial)
+            val downChanged = event.changes.firstOrNull()?.changedToDown() ?: false
+
+            if (downChanged) {
+                val currentTime = System.currentTimeMillis()
+                if (currentTime - lastTapTime < tripleTapTimeout) {
+                    tapCount++
+                } else {
+                    tapCount = 1
+                }
+                lastTapTime = currentTime
+
+                if (tapCount == 3) {
+                    onTripleTap()
+                    tapCount = 0 // Reset
+                }
+            }
+        }
+    }
+}
 
 @Composable
 fun LoginScreen(
@@ -132,7 +163,9 @@ fun LoginScreen(
                     label = { Text("Server URL") },
                     // This only appears once you click and the label moves up
                     placeholder = { Text("https://navidrome.int") },
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().onTripleTap {
+                        tempServerURL = "https://navidrome.int"
+                    },
                     singleLine = true,
                     leadingIcon = {
                         Icon(Icons.Default.Dns, contentDescription = null)
